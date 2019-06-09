@@ -1,0 +1,270 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>ltypekit Documentation</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ltypekit7</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/sign.html">sign</a></li>
+  <li><a href="../modules/signature.html">signature</a></li>
+  <li><a href="../modules/type.html">type</a></li>
+  <li><strong>util</strong></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>util</code></h1>
+<p>Various util functions for the whole project.</p>
+<p>
+
+</p>
+    <h3>Info:</h3>
+    <ul>
+        <li><strong>Copyright</strong>: 13.05.2019</li>
+        <li><strong>License</strong>: MIT</li>
+        <li><strong>Author</strong>: daelvn</li>
+    </ul>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#warnS">warnS (s)</a></td>
+	<td class="summary">Prints a simple warning.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#panicS">panicS (s)</a></td>
+	<td class="summary">Prints a panic message.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#traceback">traceback (self, s, n)</a></td>
+	<td class="summary">Prints a traceback message with details about name, signature, error and stacktrace.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#die">die (c, s, n)</a></td>
+	<td class="summary">Prints a traceback and errors.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#tracebackWarn">tracebackWarn (self, s, n)</a></td>
+	<td class="summary">Prints a traceback message, but as a warning, with details about name, signature, error and stacktrace.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#warn">warn (c, s, n)</a></td>
+	<td class="summary">Prints a traceback and errors if running in safe mode.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "warnS"></a>
+    <strong>warnS (s)</strong>
+    </dt>
+    <dd>
+    Prints a simple warning.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">s</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Error message.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "panicS"></a>
+    <strong>panicS (s)</strong>
+    </dt>
+    <dd>
+    Prints a panic message.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">s</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Error message.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "traceback"></a>
+    <strong>traceback (self, s, n)</strong>
+    </dt>
+    <dd>
+    Prints a traceback message with details about name, signature, error and stacktrace.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">self</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Signed constructor.
+        </li>
+        <li><span class="parameter">s</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Error message.
+        </li>
+        <li><span class="parameter">n</span>
+            <span class="types"><span class="type">number</span></span>
+         Error number.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "die"></a>
+    <strong>die (c, s, n)</strong>
+    </dt>
+    <dd>
+    Prints a traceback and errors.  <strong>Curried function.</strong>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">c</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Signed constructor.
+        </li>
+        <li><span class="parameter">s</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Error message.
+        </li>
+        <li><span class="parameter">n</span>
+            <span class="types"><span class="type">number</span></span>
+         Error number. Passed alongside s.
+        </li>
+    </ul>
+
+
+    <h3>Raises:</h3>
+    The error passed to the function.
+
+
+
+</dd>
+    <dt>
+    <a name = "tracebackWarn"></a>
+    <strong>tracebackWarn (self, s, n)</strong>
+    </dt>
+    <dd>
+    Prints a traceback message, but as a warning, with details about name, signature, error and stacktrace.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">self</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Signed constructor.
+        </li>
+        <li><span class="parameter">s</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Error message.
+        </li>
+        <li><span class="parameter">n</span>
+            <span class="types"><span class="type">number</span></span>
+         Warning number.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "warn"></a>
+    <strong>warn (c, s, n)</strong>
+    </dt>
+    <dd>
+    Prints a traceback and errors if running in safe mode.  <strong>Curried function.</strong>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">c</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Signed constructor.
+        </li>
+        <li><span class="parameter">s</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Error message.
+        </li>
+        <li><span class="parameter">n</span>
+            <span class="types"><span class="type">number</span></span>
+         Warning number. Passed alsongside s.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2019-06-09 19:19:50 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

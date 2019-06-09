@@ -1,0 +1,574 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>ltypekit Documentation</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ltypekit7</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/sign.html">sign</a></li>
+  <li><strong>signature</strong></li>
+  <li><a href="../modules/type.html">type</a></li>
+  <li><a href="../modules/util.html">util</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>signature</code></h1>
+<p>Module for parsing signatures.</p>
+<p>
+
+</p>
+    <h3>Info:</h3>
+    <ul>
+        <li><strong>Copyright</strong>: 09.05.2019</li>
+        <li><strong>License</strong>: MIT</li>
+        <li><strong>Author</strong>: daelvn</li>
+    </ul>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#applSplit">applSplit (appl)</a></td>
+	<td class="summary">Splits an application.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#contextSplit">contextSplit (context)</a></td>
+	<td class="summary">Splits a context string into a table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#multiargSplit">multiargSplit (arg)</a></td>
+	<td class="summary">Split for multiple arguments.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#removeTopMostParens">removeTopMostParens (str)</a></td>
+	<td class="summary">Removes the top-most parens from a string.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#applToPattern">applToPattern (cons)</a></td>
+	<td class="summary">Converts an application into a matchable pattern for comparison.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#applyLists">applyLists (a, c)</a></td>
+	<td class="summary">Turns any <code>[x]</code> into <code>{&quot;x&quot;, __list: true}</code></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#applyTables">applyTables (a, c)</a></td>
+	<td class="summary">Turns any <code>{x:y}</code> into <code>{&quot;x&quot;, &quot;y&quot;, __table: true}</code></td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#compareCons">compareCons (c1, c2)</a></td>
+	<td class="summary">Compares two constraints.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#binarize">binarize (signature, context)</a></td>
+	<td class="summary">Returns a Right and Left part for a function.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#rbinarize">rbinarize (signature, context, topmost)</a></td>
+	<td class="summary">Recursively binarize a signature.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#annotatePar">annotatePar (par, conl)</a></td>
+	<td class="summary">Annotates a parameter with a list of constraints.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#compare">compare (base, against)</a></td>
+	<td class="summary">Compares the similarity of two signatures.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#annotateAppl">annotateAppl (ap1, ap2)</a></td>
+	<td class="summary">Gets two similar type applications and makes them equal by replacing all parameters with explicit types.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#annotate">annotate (base, against, cache)</a></td>
+	<td class="summary">Annotates a node tree using a cache.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "applSplit"></a>
+    <strong>applSplit (appl)</strong>
+    </dt>
+    <dd>
+    Splits an application.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">appl</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Type application.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        Parts of the type application.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "contextSplit"></a>
+    <strong>contextSplit (context)</strong>
+    </dt>
+    <dd>
+    Splits a context string into a table.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">context</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Context.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        Parts of the context.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "multiargSplit"></a>
+    <strong>multiargSplit (arg)</strong>
+    </dt>
+    <dd>
+    Split for multiple arguments.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">arg</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Argument list.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        Parts of the argument list.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "removeTopMostParens"></a>
+    <strong>removeTopMostParens (str)</strong>
+    </dt>
+    <dd>
+    Removes the top-most parens from a string.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         String.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        String without top-most parentheses.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "applToPattern"></a>
+    <strong>applToPattern (cons)</strong>
+    </dt>
+    <dd>
+    Converts an application into a matchable pattern for comparison.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">cons</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Application to be compared.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        Pattern.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "applyLists"></a>
+    <strong>applyLists (a, c)</strong>
+    </dt>
+    <dd>
+    Turns any <code>[x]</code> into <code>{&quot;x&quot;, __list: true}</code>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         List argument.
+        </li>
+        <li><span class="parameter">c</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Context.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        A list node.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "applyTables"></a>
+    <strong>applyTables (a, c)</strong>
+    </dt>
+    <dd>
+    Turns any <code>{x:y}</code> into <code>{&quot;x&quot;, &quot;y&quot;, __table: true}</code>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         A table argument.
+        </li>
+        <li><span class="parameter">c</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Context.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        A table node.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "compareCons"></a>
+    <strong>compareCons (c1, c2)</strong>
+    </dt>
+    <dd>
+    Compares two constraints.  Curried function.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">c1</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Constraint one.
+        </li>
+        <li><span class="parameter">c2</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Constraint two.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        Result of the comparison.
+    </ol>
+
+    <h3>Raises:</h3>
+    Unmatching type application.
+
+
+
+</dd>
+    <dt>
+    <a name = "binarize"></a>
+    <strong>binarize (signature, context)</strong>
+    </dt>
+    <dd>
+    Returns a Right and Left part for a function.  It may also return a Context.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">signature</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Signature to be parsed.
+        </li>
+        <li><span class="parameter">context</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Context to be applied to the tree. Defaults to an empty table.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        Node tree for the signature. It has a left field, right field, a context field and optionally a name field.
+    </ol>
+
+    <h3>Raises:</h3>
+       Unmatching parentheses. <br/>
+   Expected '>'. <br/>
+   Unexpected '>'. <br/>
+   Unexpected tag.
+
+
+
+</dd>
+    <dt>
+    <a name = "rbinarize"></a>
+    <strong>rbinarize (signature, context, topmost)</strong>
+    </dt>
+    <dd>
+    Recursively binarize a signature.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">signature</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Signature to be recursively binarized.
+        </li>
+        <li><span class="parameter">context</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Context to apply to the signature.
+        </li>
+        <li><span class="parameter">topmost</span>
+            <span class="types"><span class="type">boolean</span></span>
+         Defines whether it is the topmost iteration or not.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        Node tree.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "annotatePar"></a>
+    <strong>annotatePar (par, conl)</strong>
+    </dt>
+    <dd>
+    Annotates a parameter with a list of constraints.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">par</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Parameter.
+        </li>
+        <li><span class="parameter">conl</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         List of constraints.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        Annotated parameter.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "compare"></a>
+    <strong>compare (base, against)</strong>
+    </dt>
+    <dd>
+    Compares the similarity of two signatures.  <strong>Curried function.</strong>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">base</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Base signature.
+        </li>
+        <li><span class="parameter">against</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Signature to compare against.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">boolean</span></span>
+        Result of the comparison.</li>
+        <li>
+           <span class="types"><span class="type">nil</span> or <a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        Error detected.</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "annotateAppl"></a>
+    <strong>annotateAppl (ap1, ap2)</strong>
+    </dt>
+    <dd>
+    Gets two similar type applications and makes them equal by replacing all parameters with explicit types.  <strong>Curried function.</strong>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ap1</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Type application one.
+        </li>
+        <li><span class="parameter">ap2</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Type application two.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        The annotated application.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "annotate"></a>
+    <strong>annotate (base, against, cache)</strong>
+    </dt>
+    <dd>
+    Annotates a node tree using a cache.  <strong>Curried function.</strong>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">base</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Base signature.
+        </li>
+        <li><span class="parameter">against</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Signature to annotate against.
+        </li>
+        <li><span class="parameter">cache</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Cache table to save the results to.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        The cache table.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2019-06-09 19:19:50 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
