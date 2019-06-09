@@ -19,6 +19,12 @@ else
 
 local sign
 
+--- Resolves a type using the cache, only for display purposes.
+resolveCache = (str, cache) ->
+  for k, v in pairs cache
+    str = str\gsub k, v
+  str
+
 --- Applies arguments to to a function and checks the types of the inputs and outputs. **Curried function.**
 -- It returns whatever the function is supposed to return.
 -- @tparam table constructor Signed constructor.
@@ -52,7 +58,7 @@ applyArguments = (constructor) -> (argl, cache={}) ->
     if isString L[i]
       if L[i]\match "^%l"
         if cache[L[i]]
-          p c "%{cyan}! Reading parameter from cache. '#{L[i]} is #{cache[L[i]]} and got #{typeof arg}."
+          p c "%{cyan}! Reading parameter from cache. '#{L[i]}' is #{cache[L[i]]} and got #{typeof arg}."
           die1 "Wrong argument ##{i} to function. Expected #{cache[L[i]]} (#{L[i]}), got #{typeof arg}.", 3 unless cache[L[i]] == typeof arg
         else
           p c "%{cyan}! Saving argument in cache. '#{L[i]}' becomes #{typeof arg}"
@@ -66,11 +72,11 @@ applyArguments = (constructor) -> (argl, cache={}) ->
     else
       ns = L[i]
       if ns.__list
-        p "verlist", (verifyList ns) arg
-        die1 "Wrong argument ##{i} to function. Expected [#{ns[1]}], got [#{typeof arg[1]}].", 6 unless (verifyList ns) arg
+        p "verlist", (verifyList ns, cache) arg
+        die1 "Wrong argument ##{i} to function. Expected [#{resolveCache ns[1], cache}], got [#{typeof arg[1]}].", 6 unless (verifyList ns, cache) arg
         arg_i[i] = arg
       elseif ns.__table
-        die1 "Wrong argument ##{i} to function. Expected {#{ns[1]}:#{ns[2]}}, got {?:?}.", 7 unless (verifyTable ns) arg
+        die1 "Wrong argument ##{i} to function. Expected {#{resolveCache ns[1], cache}:#{resolveCache ns[2], cache}}, got {?:?}.", 7 unless (verifyTable ns, cache) arg
         arg_i[i] = arg
       elseif ns.__fn
         switch type1 arg
@@ -80,7 +86,9 @@ applyArguments = (constructor) -> (argl, cache={}) ->
           when "Table"
             if "TypeKit" == kindof arg
               die1 "Wrong argument ##{i} to function. Expected #{ns.__sig}, got #{arg.__sig or "no signature"}.", 9 unless (compare ns) arg.tree
+              p c "%{cyan}! Modifying cache. From #{y cache}..."
               cache    = ((annotate ns) arg.tree) cache
+              p c "%{cyan}! #{y cache}."
               arg_i[i] = arg
             else
               p y arg
@@ -104,7 +112,7 @@ applyArguments = (constructor) -> (argl, cache={}) ->
     if isString R[i]
       if R[i]\match "^%l"
         if cache[R[i]]
-          p c "%{cyan}! Reading parameter from cache. '#{R[i]} is #{cache[R[i]]} and got #{typeof arg}."
+          p c "%{cyan}! Reading parameter from cache. '#{R[i]}' is #{cache[R[i]]} and got #{typeof arg}."
           die1 "Wrong return value ##{i} from function. Expected #{cache[R[i]]} (#{R[i]}), got #{typeof arg}.", 12 unless cache[R[i]] == typeof arg
         else
           p c "%{cyan}! Saving parameter in cache. '#{L[i]}' becomes #{typeof arg}"
@@ -118,10 +126,10 @@ applyArguments = (constructor) -> (argl, cache={}) ->
     else
       ns = R[i]
       if ns.__list
-        die1 "Wrong return value ##{i} to function. Expected [#{ns[1]}], got [#{typeof arg[1]}].", 15 unless (verifyList ns) arg
+        die1 "Wrong return value ##{i} to function. Expected [#{resolveCache ns[1], cache}], got [#{typeof arg[1]}].", 15 unless (verifyList ns, cache) arg
         arg_o[i] = arg
       elseif ns.__table
-        die1 "Wrong return value ##{i} to function. Expected {#{ns[1]}:#{ns[2]}}, got {?:?}.", 16 unless (verifyTable ns) arg
+        die1 "Wrong return value ##{i} to function. Expected {#{resolveCache ns[1], cache}:#{resolveCache ns[2], cache}}, got {?:?}.", 16 unless (verifyTable ns, cache) arg
         arg_o[i] = arg
       elseif ns.__fn
         p "hit it", type1 arg
@@ -180,8 +188,8 @@ impure = (f) -> -> f
 toNumber = sign "(toNumber) a -> Number"
 toNumber (a) -> tonumber a
 map      = sign "(map) (a -> b) -> [a] -> [b]"
-map      (f) -> (l) -> [v for v in *l]
+map      (f) -> (l) -> [f v for v in *l]
 
-p y (map toNumber) {"1", "2", "3"}
+p y (map tonumber) {"1", "2", "3"}
 
 { :sign, :impure }

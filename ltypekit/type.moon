@@ -205,15 +205,23 @@ kindof = setmetatable {
 
 --- Verifies the structure of a list. **Curried function.**
 -- @tparam table struct Structure of the list.
+-- @tparam table cache Cache table to be updated. Defaults to an empty table. Passed alongside struct.
 -- @tparam table list List to be verified.
 -- @treturn boolean Comparison result.
-verifyList = (struct) -> (list) ->
+verifyList = (struct, cache={}) -> (list) ->
   error "verifyList $ wrong argument 'list'. Expected Table, got #{typeof list}."     unless "Table" == typeof list
   error "verifyList $ wrong argument 'struct'. Expected Table, got #{typeof struct}." unless "Table" == typeof struct
   ty = struct[1]
   for elem in *list
     print "verifyList:", elem, (typeof elem), ty, (ty == typeof elem)
-    return false unless (typeof elem) == ty
+    if ty\match "^%l"
+      if cache[ty]
+        return false unless (typeof elem) == cache[ty]
+      else
+        print "set-cache-verlist", ty, typeof elem
+        cache[ty] = typeof elem
+    else
+      return false unless (typeof elem) == ty
   return true
 
 --- Verifies the structure of a map. **Curried function.**
@@ -225,8 +233,22 @@ verifyTable = (struct) -> (t) ->
   error "verifyTable $ wrong argument 'struct'. Expected Table, got #{typeof struct}." unless "Table" == typeof struct
   ty, ty2 = struct[1], struct[2]
   for k,v in pairs t
-    return false if (typeof k) != ty
-    return false if (typeof v) != ty2
+    if ty\match "^%l"
+      if cache[ty]
+        return false unless (typeof k) == cache[ty]
+      else
+        print "set-cache-vertab-k", ty, typeof k
+        cache[ty] = typeof k
+    else
+      return false unless (typeof k) == ty
+    if ty2\match "^%l"
+      if cache[ty2]
+        return false unless (typeof v) == cache[ty2]
+      else
+        print "set-cache-vertab-v", ty2, typeof v
+        cache[ty2] = typeof v
+    else
+      return false unless (typeof v) == ty
   return true
 
 {

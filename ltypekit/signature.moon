@@ -372,8 +372,9 @@ if DEBUG
   --print (compare rbinarize "(invert) {a:b} -> {b:a}") rbinarize "(invert') {k:v} -> {v:k}"
   --print (compare rbinarize "(invert) Eq a => {a:b} -> {b:a}") rbinarize "(invert') Eq k => {k:v} -> {v:k}"
   --print (compare rbinarize "(invert) Eq a => {a:b} -> {b:a}") rbinarize "(invert') Ord k => {k:v} -> {v:k}"
-  print annotatePar "String", {"Eq String"}
-  print annotatePar "a", {"Ord a"}
-  print annotatePar "b", {}
-  print y ((annotate rbinarize "() (a -> b) -> [a] -> [b]") rbinarize "() (Int -> String) -> [Int] -> [String]") {}
+  --print annotatePar "String", {"Eq String"}
+  --print annotatePar "a", {"Ord a"}
+  --print annotatePar "b", {}
+  --print y ((annotate rbinarize "() (a -> b) -> [a] -> [b]") rbinarize "() (Int -> String) -> [Int] -> [String]") {}
+  print ""
 { :contextSplit, :removeTopMostParens, :applToPattern, :binarize, :rbinarize, :annotatePar, :compareAppl, :compare, :annotate }
