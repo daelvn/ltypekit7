@@ -1,6 +1,0 @@
---> # ltypekit
---> Advanced type checking library for Lua.
--- ltypekit.7/newtype
--- By daelvn
--- 02.06.2019
---import 
