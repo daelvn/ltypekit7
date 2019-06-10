@@ -31,7 +31,17 @@ resolveCache = (str, cache) ->
 -- @tparam table argl List of arguments.
 -- @tparam table cache Cache to initialize the application with. Passed alongside argl.
 -- @return ...
--- @todo List and table validation should be annotated (String instead of a).
+-- @raise
+--   (#2) Did not pass enough arguments to function.
+--   (#3,#4,#10,#11) Wrong type passed as argument.
+--   (#5,#14) Type does not start with a letter.
+--   (#6) Wrong list passed as argument.
+--   (#7) Wrong table passed as argument.
+--   (#9) Function passed does not match.
+--   (#12,#13,#19,#20) Wrong type for return value.
+--   (#15) Wrong list returned.
+--   (#16) Wrong table returned.
+--   (#18) Function returned does not match.
 applyArguments = (constructor) -> (argl, cache={}) ->
   p c "%{yellow}@ Applying arguments to #{constructor.signature}"
   die1  = die constructor
@@ -183,13 +193,22 @@ sign = (signature, context={}, cache={}) ->
         error "sign $ Self is unknown type #{typeof @}"
   }
 
+--- Makes a function "impure". Adds a `!` marker to it when calling.
+-- @tparam function f Any function.
+-- @usage
+--   printx  = impure sign "a -> Boolean"
+--   printx! (a) -> print a
+--   printx! "string"
 impure = (f) -> -> f
 
 toNumber = sign "(toNumber) a -> Number"
 toNumber (a) -> tonumber a
 map      = sign "(map) (a -> b) -> [a] -> [b]"
 map      (f) -> (l) -> [f v for v in *l]
+map1     = sign "(map1) (a -> b) -> (c -> d) -> {a:b} -> {c:d}"
+map1     (fk) -> (fv) -> (t) -> {fk k, fv v for k, v in pairs t}
 
 p y (map tonumber) {"1", "2", "3"}
+p y ((map1 tostring) tonumber) {"1", "2", "3"}
 
 { :sign, :impure }

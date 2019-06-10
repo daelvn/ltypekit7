@@ -117,9 +117,11 @@ binarize = (signature, context={}) ->
     signature = \gsub " *%-> *",   "->"
     signature = \gsub " *%=> *",   "=>"
     signature = \gsub ",%s",       ","
-    signature = \gsub "^(%b()) *", (name) ->
+    print "bef", signature
+    signature = \gsub "^(%([^>]%)) *", (name) ->
       sigName = name\sub 2, -2
       ""
+    print "pos", signature
   signature = removeTopMostParens signature
   local getNext
   -- Tree structure
