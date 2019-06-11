@@ -118,8 +118,8 @@ binarize = (signature, context={}) ->
     signature = \gsub " *%=> *",   "=>"
     signature = \gsub ",%s",       ","
     print "bef", signature
-    signature = \gsub "^(%([^>]%)) *", (name) ->
-      sigName = name\sub 2, -2
+    signature = \gsub "^%(([^>]-)%) *", (name) ->
+      sigName = name
       ""
     print "pos", signature
   signature = removeTopMostParens signature

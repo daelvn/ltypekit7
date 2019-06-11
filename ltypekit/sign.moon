@@ -168,9 +168,11 @@ applyArguments = (constructor) -> (argl, cache={}) ->
 -- @usage Set a function to sign with a signature, then call that placeholder with the actual function definition, and then you can use it as a normal function.
 sign = (signature, context={}, cache={}) ->
   p c "%{green}# Creating signed constructor for #{signature}"
+  tree = rbinarize signature, context
   setmetatable {
     :signature
-    tree: rbinarize signature, context
+    :tree
+    name: tree.name
     type: typeof
     fn:   (->)
     --
@@ -201,14 +203,14 @@ sign = (signature, context={}, cache={}) ->
 --   printx! "string"
 impure = (f) -> -> f
 
-toNumber = sign "(toNumber) a -> Number"
-toNumber (a) -> tonumber a
-map      = sign "(map) (a -> b) -> [a] -> [b]"
-map      (f) -> (l) -> [f v for v in *l]
-map1     = sign "(map1) (a -> b) -> (c -> d) -> {a:b} -> {c:d}"
-map1     (fk) -> (fv) -> (t) -> {fk k, fv v for k, v in pairs t}
+--toNumber = sign "(toNumber) a -> Number"
+--toNumber (a) -> tonumber a
+--map      = sign "(map) (a -> b) -> [a] -> [b]"
+--map      (f) -> (l) -> [f v for v in *l]
+--map1     = sign "(map1) (a -> b) -> (c -> d) -> {a:b} -> {c:d}"
+--map1     (fk) -> (fv) -> (t) -> {(fk k), (fv v) for k, v in pairs t}
 
-p y (map tonumber) {"1", "2", "3"}
-p y ((map1 tostring) tonumber) {"1", "2", "3"}
+--p y (map tonumber) {"1", "2", "3"}
+--p y ((map1 tostring) tonumber) {"1", "2", "3"}
 
 { :sign, :impure }

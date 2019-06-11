@@ -226,9 +226,10 @@ verifyList = (struct, cache={}) -> (list) ->
 
 --- Verifies the structure of a map. **Curried function.**
 -- @tparam table struct Structure of the table.
+-- @tparam table cache Cache for parameter checking. Passed alongside `struct`.
 -- @tparam table t Table to be verified.
 -- @treturn boolean Comparison result.
-verifyTable = (struct) -> (t) ->
+verifyTable = (struct, cache) -> (t) ->
   error "verifyTable $ wrong argument 't'. Expected Table, got #{typeof t}."           unless "Table" == typeof t
   error "verifyTable $ wrong argument 'struct'. Expected Table, got #{typeof struct}." unless "Table" == typeof struct
   ty, ty2 = struct[1], struct[2]

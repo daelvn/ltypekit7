@@ -4,7 +4,8 @@
 -- @license MIT
 -- @copyright 10.06.2019
 unpack or= table.unpack
-import sign from require "ltypekit.sign"
+import sign             from require "ltypekit.sign"
+import reverse, collect from require "ltypekit.util"
 
 --- Enables referencing by changing the metatable for `_G`.
 doReferencing = ->
@@ -16,29 +17,6 @@ doReferencing = ->
 -- @tparam table ref Reference to store in `_G`
 addReference = (ref) -> _G.__ref[ref.name] = ref
 
---- Reverses a list x.
--- @todo Move this to util.
-reverse = (x) ->
-  y = {}
-  for i = #x, 1, -1
-    y[#y+1] = x[i]
-  y
-
---- Generates a function that has to be called x times to return a value.
--- @todo Move this to util.
--- @tparam function x When called with the list of accumulated arguments, returns a value.
--- @tparam number n Depth level.
--- @tparam table a Accumulated arguments.
--- @treturn function Curried function.
-collect = (f, depth, ...) ->
-  argl = {...}
-  (x) ->
-    if depth == 1
-      table.insert argl, 1, x
-      f unpack reverse argl
-    else
-      collect f, depth-1, x, unpack argl
-
 --- Creates a new constructor function out of a constructor string.
 makeConstructor = (name, cons) ->
   -- Examples of constructor strings.
@@ -48,18 +26,29 @@ makeConstructor = (name, cons) ->
   --   "a b"             : Takes any two parameters.
   --   "name:String x:a" : Record syntax.
   signature = ""
+  records   = {}
   ordered   = {}
+  i         = 0
   for arg in cons\gmatch "%S+"
+    i += 1
     if arg\match ":"
       record, type = arg\match "(.-):(.+)"
-      r = sign "(#{record}) #{name} -> #{type}"
-      r () -- DEFINE RECORD FUNCTION
-    else signature ..= "#{arg} ->"
+      -- Record
+      r          = sign "(#{record}) #{name} -> #{type}"
+      records[i] = r (t) -> t[i]
+      addReference r if _G.__ref
+      -- Type
+      signature ..= "#{arg} ->"
+      table.insert ordered, type
+    else
+      -- Type only
+      signature ..= "#{arg} ->"
+      table.insert ordered, type
   signature ..= name
   --
   c = sign signature
-  f = (...) -> -- DEFINE THE FUNCTION FOR CREATING THE TYPE
-  c collect -- FILL THIS UP
+  f = (...) -> {...}
+  return (c collect f, #ordered), records
 
 --- Creates a new type.
 -- @tparam string name Name for the new type.
