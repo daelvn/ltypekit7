@@ -5,6 +5,16 @@
 -- @copyright 09.05.2019
 native         = type
 getmetatable or= debug.getmetatable
+import DEBUG from require "ltypekit.config"
+
+local y, c, p
+if DEBUG
+  io.stdout\setvbuf "no"
+  y = require "inspect"
+  c = require "ansicolors"
+  p = print
+else
+  p, y, c = (->), (->), (->)
 
 --- Selects the first element from all arguments.
 selectFirst = (...) -> select 1, ...
@@ -96,12 +106,12 @@ typeof = setmetatable {
   -- @tparam table resolverl List of resolvers.
   -- @treturn string|false
   resolve: (any, resolverl) ->
-    -- print native any
+    -- p native any
     for resolver in *resolverl
       resolved = resolver any
       switch type1 resolved
         when "String" then return resolved
-        else               continue--print _exp_0
+        else               continue--p _exp_0
     return (type1 any) or false
 
   --- Adds a new type.
@@ -213,12 +223,12 @@ verifyList = (struct, cache={}) -> (list) ->
   error "verifyList $ wrong argument 'struct'. Expected Table, got #{typeof struct}." unless "Table" == typeof struct
   ty = struct[1]
   for elem in *list
-    print "verifyList:", elem, (typeof elem), ty, (ty == typeof elem)
+    p "verifyList:", elem, (typeof elem), ty, (ty == typeof elem)
     if ty\match "^%l"
       if cache[ty]
         return false unless (typeof elem) == cache[ty]
       else
-        print "set-cache-verlist", ty, typeof elem
+        p "set-cache-verlist", ty, typeof elem
         cache[ty] = typeof elem
     else
       return false unless (typeof elem) == ty
@@ -238,7 +248,7 @@ verifyTable = (struct, cache) -> (t) ->
       if cache[ty]
         return false unless (typeof k) == cache[ty]
       else
-        print "set-cache-vertab-k", ty, typeof k
+        p "set-cache-vertab-k", ty, typeof k
         cache[ty] = typeof k
     else
       return false unless (typeof k) == ty
@@ -246,7 +256,7 @@ verifyTable = (struct, cache) -> (t) ->
       if cache[ty2]
         return false unless (typeof v) == cache[ty2]
       else
-        print "set-cache-vertab-v", ty2, typeof v
+        p "set-cache-vertab-v", ty2, typeof v
         cache[ty2] = typeof v
     else
       return false unless (typeof v) == ty

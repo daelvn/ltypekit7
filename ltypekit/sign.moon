@@ -15,7 +15,7 @@ if DEBUG
   c = require "ansicolors"
   p = print
 else
-  p = ->
+  p, y, c = (->), (->), (->)
 
 local sign
 

@@ -4,28 +4,37 @@
 -- @license MIT
 -- @copyright 10.06.2019
 unpack or= table.unpack
-import sign             from require "ltypekit.sign"
-import reverse, collect from require "ltypekit.util"
+import sign               from require "ltypekit.sign"
+import reverse, collect   from require "ltypekit.util"
+import metatype, metakind from require "ltypekit.type"
+import DEBUG              from require "ltypekit.config"
 
---- Enables referencing by changing the metatable for `_G`.
-doReferencing = ->
-  gmt         = (getmetatable _G) or {}
-  _G.__ref    = {}
-  gmt.__index = _G.__ref
+local y, c, p
+if DEBUG
+  io.stdout\setvbuf "no"
+  y = require "inspect"
+  c = require "ansicolors"
+  p = print
+else
+  p, y, c = (->), (->), (->)
 
 --- Adds a new reference in `_G.__ref`
 -- @tparam table ref Reference to store in `_G`
 addReference = (ref) -> _G.__ref[ref.name] = ref
 
 --- Creates a new constructor function out of a constructor string.
-makeConstructor = (name, cons) ->
+-- @tparam string type_ Name of the type.
+-- @tparam string name Name of the constructor.
+-- @tparam string cons Constructor string.
+-- @treturn function Constructor.
+makeConstructor = (type_, name, cons) ->
   -- Examples of constructor strings.
   --   "String"          : Requires a single string.
   --   "String String"   : Requires two strings.
   --   "a"               : Takes any parameter.
   --   "a b"             : Takes any two parameters.
   --   "name:String x:a" : Record syntax.
-  signature = ""
+  signature = "(#{name}) "
   records   = {}
   ordered   = {}
   i         = 0
@@ -34,35 +43,41 @@ makeConstructor = (name, cons) ->
     if arg\match ":"
       record, type = arg\match "(.-):(.+)"
       -- Record
-      r          = sign "(#{record}) #{name} -> #{type}"
-      records[i] = r (t) -> t[i]
+      r               = sign "(#{record}) #{name} -> #{type}"
+      records[record] = r (t) -> t[i]
       addReference r if _G.__ref
       -- Type
-      signature ..= "#{arg} ->"
+      signature ..= "#{type} ->"
       table.insert ordered, type
     else
       -- Type only
       signature ..= "#{arg} ->"
       table.insert ordered, type
-  signature ..= name
+  signature ..= " " .. type_
   --
   c = sign signature
-  f = (...) -> {...}
+  f = (...) -> (metatype type_) (metakind name) {...}
   return (c collect f, #ordered), records
 
 --- Creates a new type.
 -- @tparam string name Name for the new type.
 -- @tparam table|string constructorl List of constructors to use, or a single constructor string.
--- @tparam Type Newly created type.
+-- @treturn Type Newly created type.
 data = (name, constructorl) ->
-  this   = { :name }
-  __this = { __ref: {}, __index: __this.__ref, __type: "Type", __kind: name }
+  this           = { :name }
+  __this         = { __ref: {}, __type: "Type", __kind: name }
+  __this.__index = __this.__ref
   switch type constructorl
-    when "string" then __this.__call = makeConstructor constructorl
+    when "string"
+      __this.__call = (...) =>
+        f, records = makeConstructor name, name, constructorl
+        for k,r in pairs records do __this.__ref[k] = r
+        f ...
     when "table"
       for constructor, annot in pairs constructorl
-        __this.__ref[constructor] = makeConstructor annot
+        __this.__ref[constructor] = makeConstructor name, constructor, annot
         addReference __this.__ref[constructor] if _G.__ref
+  setmetatable this, __this
 
 --Maybe = data "Maybe",
 --  Nothing: ""
@@ -78,3 +93,19 @@ data = (name, constructorl) ->
 --  when x then Maybe.Just x
 
 --Person = data "Person", "s"
+
+--Just = data "Just", "value:a"
+--just = Just 5
+--p Just.value just
+
+Maybe = data "Maybe",
+  Nothing: ""
+  Just:    "a"
+
+just    = Maybe.Just 5
+p y just
+-- For some reason, this is not returning the right thing.
+-- It is, in fact, erroring. Expected Maybe, got Function.
+-- Think it has to do with `collect` depth not being like, one.
+nothing = Maybe.Nothing!
+p y nothing
