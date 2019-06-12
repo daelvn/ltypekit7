@@ -155,13 +155,23 @@ metakindFor = (t) ->
     false
 
 --- Sets a `__call` metamethod for a table.
--- @tparam string f A function
+-- @tparam function f A function
 -- @tparam table t Table to set the metamethod for.
 metacall = (f) -> (t) ->
   if x = getmetatable t
     x.__call = f
   else
     setmetatable t, { __call: f }
+  return t
+
+--- Sets an `__index` metamethod for a table.
+-- @tparam function|table f A function or table for indexing.
+-- @tparam table t Table to set the metamethod for.
+metaindex = (ft) -> (t) ->
+  if x = getmetatable t
+    x.__index = ft
+  else
+    setmetatable t, { __index: ft }
   return t
 
 --- Checks for a `__kind` metamethod. It can be either a function or a string.
@@ -265,5 +275,5 @@ verifyTable = (struct, cache) -> (t) ->
 {
   :typeof, :hasMeta, :isIO, :metatype, :metakind, :metakindFor, :metacall, :type1, :kindof
   :isString, :isNumber, :isBoolean, :isTable, :isNil, :isThread, :isUserdata, :isFunction
-  :verifyList, :verifyTable
+  :verifyList, :verifyTable, :metaindex
 }

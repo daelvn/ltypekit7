@@ -78,10 +78,12 @@ reverse = (x) ->
 collect = (f, depth, ...) ->
   argl = {...}
   (x) ->
-    if depth == 1
+    if depth == 0
+      return f!
+    elseif depth == 1
       table.insert argl, 1, x
-      f unpack reverse argl
+      return f unpack reverse argl
     else
-      collect f, depth-1, x, unpack argl
+      return collect f, depth-1, x, unpack argl
 
 { :warnS, :panicS, :traceback, :tracebackWarn, :die, :warn, :reverse, :collect }

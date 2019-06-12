@@ -1,5 +1,5 @@
 --- Typeclasses, instances and type representations to use alongside `type`.
--- @module type
+-- @module typeclass
 -- @author daelvn
 -- @license MIT
 -- @copyright 10.06.2019
@@ -57,6 +57,7 @@ makeConstructor = (type_, name, cons) ->
   --
   c = sign signature
   f = (...) -> (metatype type_) (metakind name) {...}
+  p "len", #ordered
   return (c collect f, #ordered), records
 
 --- Creates a new type.
@@ -79,9 +80,9 @@ data = (name, constructorl) ->
         addReference __this.__ref[constructor] if _G.__ref
   setmetatable this, __this
 
---Maybe = data "Maybe",
---  Nothing: ""
---  Just:    "a"
+Maybe = data "Maybe",
+  Nothing: ""
+  Just:    "a"
 
 --f = sign "Int -> Maybe Int"
 --f (x) -> switch x
@@ -92,20 +93,9 @@ data = (name, constructorl) ->
 --  when 0 then Maybe.Nothing
 --  when x then Maybe.Just x
 
---Person = data "Person", "s"
+--just    = Maybe.Just 5
+--p y just
+--nothing = Maybe.Nothing!
+--p y nothing
 
---Just = data "Just", "value:a"
---just = Just 5
---p Just.value just
-
-Maybe = data "Maybe",
-  Nothing: ""
-  Just:    "a"
-
-just    = Maybe.Just 5
-p y just
--- For some reason, this is not returning the right thing.
--- It is, in fact, erroring. Expected Maybe, got Function.
--- Think it has to do with `collect` depth not being like, one.
-nothing = Maybe.Nothing!
-p y nothing
+{ :addReference, :data }

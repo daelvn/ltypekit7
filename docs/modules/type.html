@@ -33,16 +33,24 @@
 <h2>Contents</h2>
 <ul>
 <li><a href="#Functions">Functions</a></li>
+<li><a href="#Tables">Tables</a></li>
+<li><a href="#typeof">typeof</a></li>
+<li><a href="#kindof">kindof</a></li>
 </ul>
 
 
 <h2>Modules</h2>
 <ul class="nowrap">
+  <li><a href="../modules/init.html">init</a></li>
   <li><a href="../modules/sign.html">sign</a></li>
   <li><a href="../modules/signature.html">signature</a></li>
   <li><strong>type</strong></li>
-  <li><strong>type</strong></li>
+  <li><a href="../modules/typeclass.html">typeclass</a></li>
   <li><a href="../modules/util.html">util</a></li>
+</ul>
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="../examples/maybe.moon.html">maybe.moon</a></li>
 </ul>
 
 </div>
@@ -50,13 +58,13 @@
 <div id="content">
 
 <h1>Module <code>type</code></h1>
-<p>Typeclasses, instances and type representations to use alongside <a href="../modules/type.html#">type</a>.</p>
+<p>Contains a replacement for the native Lua <a href="../modules/type.html#">type</a> function and implements resolvers and kinds.</p>
 <p>
 
 </p>
     <h3>Info:</h3>
     <ul>
-        <li><strong>Copyright</strong>: 10.06.2019</li>
+        <li><strong>Copyright</strong>: 09.05.2019</li>
         <li><strong>License</strong>: MIT</li>
         <li><strong>Author</strong>: daelvn</li>
     </ul>
@@ -65,16 +73,113 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#addReference">addReference (ref)</a></td>
-	<td class="summary">Adds a new reference in <code>_G.__ref</code></td>
+	<td class="name" nowrap><a href="#selectFirst">selectFirst (...)</a></td>
+	<td class="summary">Selects the first element from all arguments.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#makeConstructor">makeConstructor (type_, name, cons)</a></td>
-	<td class="summary">Creates a new constructor function out of a constructor string.</td>
+	<td class="name" nowrap><a href="#selectLast">selectLast (...)</a></td>
+	<td class="summary">Selects the last element from all arguments.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#data">data (name, constructorl)</a></td>
-	<td class="summary">Creates a new type.</td>
+	<td class="name" nowrap><a href="#type1">type1 (a)</a></td>
+	<td class="summary"><a href="../modules/type.html#">type</a> equivalent, but returns uppercase values.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#hasMeta">hasMeta (any)</a></td>
+	<td class="summary">Checks for a <code>__type</code> metamethod.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#isIO">isIO (a)</a></td>
+	<td class="summary">Checks whether it is an <a href="https://www.lua.org/manual/5.3/manual.html#6.8">io</a> library handle.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#metatype">metatype (ty, t)</a></td>
+	<td class="summary">Sets a <code>__type</code> metamethod for a table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#metakind">metakind (k, t)</a></td>
+	<td class="summary">Sets a <code>__kind</code> metamethod for a table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#metakindFor">metakindFor (t)</a></td>
+	<td class="summary">Returns the <code>__kind</code> metamethod for a table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#metacall">metacall (f, t)</a></td>
+	<td class="summary">Sets a <a href="../modules/type.html#__call">__call</a> metamethod for a table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#metaindex">metaindex (f, t)</a></td>
+	<td class="summary">Sets an <code>__index</code> metamethod for a table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#hasKind">hasKind (any)</a></td>
+	<td class="summary">Checks for a <code>__kind</code> metamethod.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#verifyList">verifyList (struct, cache, list)</a></td>
+	<td class="summary">Verifies the structure of a list.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#verifyTable">verifyTable (struct, cache, t)</a></td>
+	<td class="summary">Verifies the structure of a map.</td>
+	</tr>
+</table>
+<h2><a href="#Tables">Tables</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#baseTypes">baseTypes</a></td>
+	<td class="summary">Native type checking.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#nativeResolvers">nativeResolvers</a></td>
+	<td class="summary">Type resolvers for native types.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#typeof">typeof</a></td>
+	<td class="summary">Returns the type of a value.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#kindof">kindof</a></td>
+	<td class="summary">Returns the kind of a value.</td>
+	</tr>
+</table>
+<h2><a href="#typeof">typeof</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#resolvers">resolvers</a></td>
+	<td class="summary">List of implicit resolvers to <a href="../modules/type.html#typeof">typeof</a>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#resolve">resolve (any, resolverl)</a></td>
+	<td class="summary">Resolves a value given a list of resolvers.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#add">add (resolver)</a></td>
+	<td class="summary">Adds a new type.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#__call">__call (a)</a></td>
+	<td class="summary">Resolves a value with the implicit list of resolvers.</td>
+	</tr>
+</table>
+<h2><a href="#kindof">kindof</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#resolvers">resolvers</a></td>
+	<td class="summary">Contains the implicit resolvers for <a href="../modules/type.html#kindof">kindof</a>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#resolve">resolve (any, resolverl)</a></td>
+	<td class="summary">Resolves a value given a list of resolvers.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#add">add (resolver)</a></td>
+	<td class="summary">Adds a new kind.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#__call">__call (a)</a></td>
+	<td class="summary">Resolves a value with the implicit list of resolvers.</td>
 	</tr>
 </table>
 
@@ -86,18 +191,19 @@
 
     <dl class="function">
     <dt>
-    <a name = "addReference"></a>
-    <strong>addReference (ref)</strong>
+    <a name = "selectFirst"></a>
+    <strong>selectFirst (...)</strong>
     </dt>
     <dd>
-    Adds a new reference in <code>_G.__ref</code>
+    Selects the first element from all arguments.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">ref</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
-         Reference to store in <code>_G</code>
+        <li><span class="parameter">...</span>
+
+
+
         </li>
     </ul>
 
@@ -107,34 +213,49 @@
 
 </dd>
     <dt>
-    <a name = "makeConstructor"></a>
-    <strong>makeConstructor (type_, name, cons)</strong>
+    <a name = "selectLast"></a>
+    <strong>selectLast (...)</strong>
     </dt>
     <dd>
-    Creates a new constructor function out of a constructor string.
+    Selects the last element from all arguments.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">type_</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
-         Name of the type.
+        <li><span class="parameter">...</span>
+
+
+
         </li>
-        <li><span class="parameter">name</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
-         Name of the constructor.
-        </li>
-        <li><span class="parameter">cons</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
-         Constructor string.
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "type1"></a>
+    <strong>type1 (a)</strong>
+    </dt>
+    <dd>
+    <a href="../modules/type.html#">type</a> equivalent, but returns uppercase values.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+         any value
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">function</span></span>
-        Constructor.
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a> or <span class="type">nil</span></span>
+
+
+
     </ol>
 
 
@@ -142,30 +263,608 @@
 
 </dd>
     <dt>
-    <a name = "data"></a>
-    <strong>data (name, constructorl)</strong>
+    <a name = "hasMeta"></a>
+    <strong>hasMeta (any)</strong>
     </dt>
     <dd>
-    Creates a new type.
+    Checks for a <code>__type</code> metamethod.  It can be either a function or a string.
+ If it is a function, it will be called with the value as an argument. <br/>
+ As <a href="../modules/type.html#hasMeta">hasMeta</a> allows you to have a function be called with the value, the type returned can depend on the value. This
+ is called "dynamic types" in ltypekit. It means that you can define a single type (<code>Boolean</code>) and have it return two
+ types (<code>True</code> or <code>False</code>).
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">name</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
-         Name for the new type.
-        </li>
-        <li><span class="parameter">constructorl</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a> or <a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
-         List of constructors to use, or a single constructor string.
+        <li><span class="parameter">any</span>
+         any value
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">Type</span></span>
-        Newly created type.
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a> or <span class="type">false</span></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "isIO"></a>
+    <strong>isIO (a)</strong>
+    </dt>
+    <dd>
+    Checks whether it is an <a href="https://www.lua.org/manual/5.3/manual.html#6.8">io</a> library handle.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+         any value
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">"IO"</span> or <span class="type">false</span></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "metatype"></a>
+    <strong>metatype (ty, t)</strong>
+    </dt>
+    <dd>
+    Sets a <code>__type</code> metamethod for a table.  <strong>This is a curried function</strong>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ty</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Type name
+        </li>
+        <li><span class="parameter">t</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Table to apply the metamethod to.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "metakind"></a>
+    <strong>metakind (k, t)</strong>
+    </dt>
+    <dd>
+    Sets a <code>__kind</code> metamethod for a table.  Only used internally.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">k</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Kind name
+        </li>
+        <li><span class="parameter">t</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Table to apply the metamethod to.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "metakindFor"></a>
+    <strong>metakindFor (t)</strong>
+    </dt>
+    <dd>
+    Returns the <code>__kind</code> metamethod for a table.  Only used internally.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Table to get the metamethod from.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "metacall"></a>
+    <strong>metacall (f, t)</strong>
+    </dt>
+    <dd>
+    Sets a <a href="../modules/type.html#__call">__call</a> metamethod for a table.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">f</span>
+            <span class="types"><span class="type">function</span></span>
+         A function
+        </li>
+        <li><span class="parameter">t</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Table to set the metamethod for.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "metaindex"></a>
+    <strong>metaindex (f, t)</strong>
+    </dt>
+    <dd>
+    Sets an <code>__index</code> metamethod for a table.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">f</span>
+            <span class="types"><span class="type">function</span> or <a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         A function or table for indexing.
+        </li>
+        <li><span class="parameter">t</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Table to set the metamethod for.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "hasKind"></a>
+    <strong>hasKind (any)</strong>
+    </dt>
+    <dd>
+    Checks for a <code>__kind</code> metamethod.  It can be either a function or a string.
+ If it is a function, it will be called with the value as an argument.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">any</span>
+         Any value.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a> or <span class="type">false</span></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "verifyList"></a>
+    <strong>verifyList (struct, cache, list)</strong>
+    </dt>
+    <dd>
+    Verifies the structure of a list.  <strong>Curried function.</strong>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">struct</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Structure of the list.
+        </li>
+        <li><span class="parameter">cache</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Cache table to be updated. Defaults to an empty table. Passed alongside struct.
+        </li>
+        <li><span class="parameter">list</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         List to be verified.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        Comparison result.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "verifyTable"></a>
+    <strong>verifyTable (struct, cache, t)</strong>
+    </dt>
+    <dd>
+    Verifies the structure of a map.  <strong>Curried function.</strong>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">struct</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Structure of the table.
+        </li>
+        <li><span class="parameter">cache</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Cache for parameter checking. Passed alongside <code>struct</code>.
+        </li>
+        <li><span class="parameter">t</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Table to be verified.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        Comparison result.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "baseTypes"></a>
+    <strong>baseTypes</strong>
+    </dt>
+    <dd>
+    Native type checking.
+ Direct <a href="../modules/type.html#">type</a> replacement and extension functions. This is done so native types match the Uppercase style.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">number</span>
+         "Number"
+        </li>
+        <li><span class="parameter">string</span>
+         "String"
+        </li>
+        <li><span class="parameter">function</span>
+         "Function"
+        </li>
+        <li><span class="parameter">thread</span>
+         "Thread"
+        </li>
+        <li><span class="parameter">nil</span>
+         "Nil"
+        </li>
+        <li><span class="parameter">userdata</span>
+         "Userdata"
+        </li>
+        <li><span class="parameter">table</span>
+         "Table"
+        </li>
+        <li><span class="parameter">boolean</span>
+         "Boolean"
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "nativeResolvers"></a>
+    <strong>nativeResolvers</strong>
+    </dt>
+    <dd>
+    Type resolvers for native types.
+ Each of the functions are prefixed with "is" and suffixed with an uppercase type name.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">isNumber</span>
+         Returns either "Number" or false.
+        </li>
+        <li><span class="parameter">isString</span>
+         Returns either "String" or false.
+        </li>
+        <li><span class="parameter">isFunction</span>
+         Returns either "Function" or false.
+        </li>
+        <li><span class="parameter">isThread</span>
+         Returns either "Thread" or false.
+        </li>
+        <li><span class="parameter">isNil</span>
+         Returns either "Nil" or false.
+        </li>
+        <li><span class="parameter">isUserdata</span>
+         Returns either "Userdata" or false.
+        </li>
+        <li><span class="parameter">isTable</span>
+         Returns either "Table" or false.
+        </li>
+        <li><span class="parameter">isBoolean</span>
+         Returns either "Boolean" or false.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "typeof"></a>
+    <strong>typeof</strong>
+    </dt>
+    <dd>
+    Returns the type of a value.  It requires to be a table with methods to exploit the mutability of Lua tables.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">resolvers</span>
+         List of resolvers used by typeof.
+        </li>
+        <li><span class="parameter">add</span>
+         Adds a new type.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "kindof"></a>
+    <strong>kindof</strong>
+    </dt>
+    <dd>
+    Returns the kind of a value.  It is a table for the same reason than typeof.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">resolvers</span>
+         List of resolvers used by <a href="../modules/type.html#kindof">kindof</a>.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="typeof"></a>typeof</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "resolvers"></a>
+    <strong>resolvers</strong>
+    </dt>
+    <dd>
+    List of implicit resolvers to <a href="../modules/type.html#typeof">typeof</a>.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "resolve"></a>
+    <strong>resolve (any, resolverl)</strong>
+    </dt>
+    <dd>
+    Resolves a value given a list of resolvers.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">any</span>
+         Any value.
+        </li>
+        <li><span class="parameter">resolverl</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         List of resolvers.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a> or <span class="type">false</span></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "add"></a>
+    <strong>add (resolver)</strong>
+    </dt>
+    <dd>
+    Adds a new type.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">resolver</span>
+            <span class="types"><span class="type">function</span></span>
+         Resolver for the new type.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "__call"></a>
+    <strong>__call (a)</strong>
+    </dt>
+    <dd>
+    Resolves a value with the implicit list of resolvers.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+         Any value.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a> or <span class="type">false</span></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="kindof"></a>kindof</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "resolvers"></a>
+    <strong>resolvers</strong>
+    </dt>
+    <dd>
+    Contains the implicit resolvers for <a href="../modules/type.html#kindof">kindof</a>.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "resolve"></a>
+    <strong>resolve (any, resolverl)</strong>
+    </dt>
+    <dd>
+    Resolves a value given a list of resolvers.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">any</span>
+         Any value.
+        </li>
+        <li><span class="parameter">resolverl</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         List of resolvers.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a> or <span class="type">false</span></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "add"></a>
+    <strong>add (resolver)</strong>
+    </dt>
+    <dd>
+    Adds a new kind.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">resolver</span>
+            <span class="types"><span class="type">function</span></span>
+         Resolver for the new kind.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "__call"></a>
+    <strong>__call (a)</strong>
+    </dt>
+    <dd>
+    Resolves a value with the implicit list of resolvers.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+         Any value.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a> or <span class="type">false</span></span>
+
+
+
     </ol>
 
 
@@ -179,7 +878,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2019-06-12 00:00:21 </i>
+<i style="float:right;">Last updated 2019-06-12 23:55:24 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
