@@ -58,7 +58,10 @@ makeConstructor = (type_, name, cons) ->
   c = sign signature
   f = (...) -> (metatype type_) (metakind name) {...}
   p "len", #ordered
-  return (c collect f, #ordered), records
+  if #ordered > 0
+    return (c collect f, #ordered), records
+  else
+    return ((metatype type_) (metakind name) {}), {}
 
 --- Creates a new type.
 -- @tparam string name Name for the new type.
@@ -80,9 +83,9 @@ data = (name, constructorl) ->
         addReference __this.__ref[constructor] if _G.__ref
   setmetatable this, __this
 
-Maybe = data "Maybe",
-  Nothing: ""
-  Just:    "a"
+--Maybe = data "Maybe",
+--  Nothing: ""
+--  Just:    "a"
 
 --f = sign "Int -> Maybe Int"
 --f (x) -> switch x
@@ -95,7 +98,8 @@ Maybe = data "Maybe",
 
 --just    = Maybe.Just 5
 --p y just
---nothing = Maybe.Nothing!
+--nothing = Maybe.Nothing
+--p y Maybe.Nothing
 --p y nothing
 
 { :addReference, :data }
