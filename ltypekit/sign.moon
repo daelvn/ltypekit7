@@ -32,16 +32,16 @@ resolveCache = (str, cache) ->
 -- @tparam table cache Cache to initialize the application with. Passed alongside argl.
 -- @return ...
 -- @raise
---   (#2) Did not pass enough arguments to function.
---   (#3,#4,#10,#11) Wrong type passed as argument.
---   (#5,#14) Type does not start with a letter.
---   (#6) Wrong list passed as argument.
---   (#7) Wrong table passed as argument.
---   (#9) Function passed does not match.
---   (#12,#13,#19,#20) Wrong type for return value.
---   (#15) Wrong list returned.
---   (#16) Wrong table returned.
---   (#18) Function returned does not match.
+--   (#2) Did not pass enough arguments to function.  
+--   (#3,#4,#10,#11) Wrong type passed as argument.  
+--   (#5,#14) Type does not start with a letter.  
+--   (#6) Wrong list passed as argument.  
+--   (#7) Wrong table passed as argument.  
+--   (#9) Function passed does not match.  
+--   (#12,#13,#19,#20) Wrong type for return value.  
+--   (#15) Wrong list returned.  
+--   (#16) Wrong table returned.  
+--   (#18) Function returned does not match.  
 applyArguments = (constructor) -> (argl, cache={}) ->
   p c "%{yellow}@ Applying arguments to #{constructor.signature}"
   die1  = die constructor
@@ -145,7 +145,6 @@ applyArguments = (constructor) -> (argl, cache={}) ->
         p "hit it", type1 arg
         switch type1 arg
           when "Function"
-            p "yeetus"
             warn1 "Return value ##{i} returned has no known signature. Automatically signing. This may have unintended consequences.", 17
             arg_o[i] = (sign "(#{constructor.tree.name}) "..ns.__sig, {}, cache) arg
             p "reach?", y arg_o[i]
@@ -166,7 +165,7 @@ applyArguments = (constructor) -> (argl, cache={}) ->
 -- @tparam table cache Cache to initialize the application with. Defaults to an empty table.
 -- @treturn table Signed constructor.
 -- @usage Set a function to sign with a signature, then call that placeholder with the actual function definition, and then you can use it as a normal function.
-sign = (signature, context={}, cache={}) ->
+sign = (signature, context={}, cache) ->
   p c "%{green}# Creating signed constructor for #{signature}"
   tree = rbinarize signature, context
   setmetatable {
@@ -182,15 +181,17 @@ sign = (signature, context={}, cache={}) ->
     __type: "SignedConstructor"
     __kind: "TypeKit"
     __call: (...) =>
-      argl = {...}
       if "SignedConstructor" == typeof @
+        argl = {...}
         @fn = ("Function" == typeof argl[1]) and argl[1] or error "sign $ Invalid function passed to signed constructor for '#{@signature}', got #{typeof argl[1]}."
         p c "%{yellow}@ Setting function for #{@signature}"
         (metatype "Function") @
       elseif "Function" == typeof @
+        p "precache?", y argl
+        argl = {...}
         p (c "%{yellow}@ Calling function #{@signature}"), y argl
-        p (c "%{magenta}= Using cache"), y cache
-        return (applyArguments @) argl, cache
+        p (c "%{magenta}= Using cache"), y (cache or {})
+        return (applyArguments @) argl, (cache or {})
       else
         error "sign $ Self is unknown type #{typeof @}"
   }

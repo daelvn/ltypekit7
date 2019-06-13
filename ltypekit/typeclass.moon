@@ -55,13 +55,15 @@ makeConstructor = (type_, name, cons) ->
       table.insert ordered, type
   signature ..= " " .. type_
   --
-  c = sign signature
-  f = (...) -> (metatype type_) (metakind name) {...}
   p "len", #ordered
   if #ordered > 0
+    c = sign signature
+    f = (...) ->
+      p "constructing-with", y {...}
+      (metatype type_) (metakind name) {...}
     return (c collect f, #ordered), records
   else
-    return ((metatype type_) (metakind name) {}), {}
+    return ((metatype type_) (metakind name) {:name}), {}
 
 --- Creates a new type.
 -- @tparam string name Name for the new type.
@@ -83,9 +85,9 @@ data = (name, constructorl) ->
         addReference __this.__ref[constructor] if _G.__ref
   setmetatable this, __this
 
---Maybe = data "Maybe",
---  Nothing: ""
---  Just:    "a"
+Maybe = data "Maybe",
+  Nothing: ""
+  Just:    "a"
 
 --f = sign "Int -> Maybe Int"
 --f (x) -> switch x

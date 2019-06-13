@@ -20,7 +20,7 @@ Maybe = data "Maybe",
   Nothing: ""
   Just:    "a"
 
-just    = Just 5
-p y just
-nothing = Nothing!
-p y nothing
+just    = Just 1
+justs   = Just "string"
+just3   = Just 3
+nothing = Nothing

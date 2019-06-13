@@ -78,11 +78,13 @@ reverse = (x) ->
 collect = (f, depth, ...) ->
   argl = {...}
   (x) ->
-    if depth == 0
-      return f!
-    elseif depth == 1
+    if depth == 1
       table.insert argl, 1, x
-      return f unpack reverse argl
+      r    = f unpack reverse argl
+      argl = {}
+      return r
+    elseif depth == 0
+      return f!
     else
       return collect f, depth-1, x, unpack argl
 
