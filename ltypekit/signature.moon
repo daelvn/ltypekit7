@@ -32,6 +32,7 @@ applSplit = (appl) ->
   return appl if (type appl) != "string"
   x = [part for part in appl\gmatch "%S+"]
   x.__appl = true
+  setmetatable x, __tostring: => table.concat @, " "
   return x if #x > 1 else appl
 
 --- Splits a context string into a table.

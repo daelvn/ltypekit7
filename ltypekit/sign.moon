@@ -62,6 +62,33 @@ msg =
   unknown_signature: (f,w) -> (i) ->
     w "Argument ##{i} has no known signature."
 
+--- Verifies a type application. **Curried function.**
+-- @tparam table a1 Base application.
+-- @tparam table cache Cache. Passed alongside a1.
+-- @tparam number i Argument number. Passed alongside a1.
+-- @tparam table a2 Application to compare against.
+-- @treturn boolean Whether it could compare.
+verifyAppl = (a1, cache, i) -> (a2) ->
+  main = a1[1]
+  -- applications have a __tostring method
+  msg.expected i, a1, typeof a2 unless main == typeof a2
+  --
+  for j=2, #a1
+    param  = a1[j]
+    xparam = a2[j]
+    if param\match "^%l"
+      if cache[param]
+        msg.reading_from_cache param, cache[param], typeof xparam
+        msg.expected_cache j, cache[param], param, typeof xparam unless cache[param] == typeof xparam
+      else
+        msg.saving_in_cache param, typeof xparam
+        cache[param] = typeof xparam
+    elseif param\match "^%u"
+      msg.expected j, a1, "#{typeof xparam} (##{j})" unless param == typeof xparam
+    else
+      msg.malformed param
+  true
+
 --- Checks the values of a side for `applyArguments`.
 -- @tparam table T Node tree (side).
 -- @tparam table argl Argument list.
@@ -95,6 +122,9 @@ checkSide = (T, argl, cache) ->
       elseif ns.__table
         msg.expected_table i, (resolveCache ns[1], cache), (resolveCache ns[2], cache) unless (verifyTable ns, cache) arg
         arg_x[i] = arg
+      elseif ns.__appl
+        msg.expected i, ns, typeof arg unless (verifyAppl ns, cache, i) arg
+        arg_x[i] = arg
       elseif ns.__fn
         switch type1 arg
           when "Function"
@@ -113,6 +143,7 @@ checkSide = (T, argl, cache) ->
           else
             msg.expected i, ns.__sig, typeof arg
   arg_x
+
 --- Applies arguments to to a function and checks the types of the inputs and outputs. **Curried function.**
 -- It returns whatever the function is supposed to return.
 -- @tparam table constructor Signed constructor.
