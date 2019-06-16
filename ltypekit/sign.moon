@@ -31,17 +31,17 @@ green   = "%{green}"
 magenta = "%{magenta}"
 blue    = "%{blue}"
 --- A table to contain all debug, warning, and error messages.
--- @table msg
+-- @table msg_
 -- @field reading_from_cache `(f,w) -> (name, is, got) -> ...`
 -- @field saving_in_cache `(f,w) -> (name, becomes) -> ...`
 -- @field modifying_cache `(f,w) -> (from_) -> (to) -> ...`
--- @field expected_cache `(f,w) -> (i, type, name, got) -> ...`
--- @field expected `(f,w) -> (i, type, name) -> ...`
--- @field expected_list `(f,w) -> (i, type, name) -> ...`
+-- @field expected_cache `(f,w) -> (i, type_, name, got) -> ...`
+-- @field expected `(f,w) -> (i, type_, name) -> ...`
+-- @field expected_list `(f,w) -> (i, type_, name) -> ...`
 -- @field expected_table `(f,w) -> (i, key, value) -> ...`
 -- @field malformed `(f,w) -> (name) -> ...`
 -- @field unknown_signature `(f,w) -> (i) -> ...`
-msg =
+msg_ =
   reading_from_cache: (f,w) -> (name, is, got) ->
     p c cyan.."! Reading parameter from cache. '#{name}' is #{is} and got #{got}."
   saving_in_cache: (f,w) -> (name, becomes) ->
@@ -49,12 +49,12 @@ msg =
   modifying_cache: (f,w) -> (from_) ->
     p (c cyan.."! Modifying cache. From... "), y from_
     (to) -> p y to
-  expected_cache: (f,w) -> (i, type, name, got) ->
-    f "Wrong value ##{i}. Expected #{type} (#{name}), got #{got}."
-  expected: (f,w) -> (i, type, got) ->
-    f "Wrong value ##{i}. Expected #{type}, got #{got}."
-  expected_list: (f,w) -> (i, type, got) ->
-    f "Wrong value ##{i}. Expected [#{type}], got [#{got}]"
+  expected_cache: (f,w) -> (i, type_, name, got) ->
+    f "Wrong value ##{i}. Expected #{type_} (#{name}), got #{got}."
+  expected: (f,w) -> (i, type_, got) ->
+    f "Wrong value ##{i}. Expected #{type_}, got #{got}."
+  expected_list: (f,w) -> (i, type_, got) ->
+    f "Wrong value ##{i}. Expected [#{type_}], got [#{got}]"
   expected_table: (f,w) -> (i, key, value) ->
     f "Wrong value ##{i}. Expected {#{key}:#{value}}, got {?:?}."
   malformed: (f,w) -> (name) ->
@@ -66,9 +66,10 @@ msg =
 -- @tparam table a1 Base application.
 -- @tparam table cache Cache. Passed alongside a1.
 -- @tparam number i Argument number. Passed alongside a1.
+-- @tparam table msg Table with error messages.
 -- @tparam table a2 Application to compare against.
 -- @treturn boolean Whether it could compare.
-verifyAppl = (a1, cache, i) -> (a2) ->
+verifyAppl = (a1, cache, i, msg) -> (a2) ->
   main = a1[1]
   -- applications have a __tostring method
   msg.expected i, a1, typeof a2 unless main == typeof a2
@@ -93,8 +94,9 @@ verifyAppl = (a1, cache, i) -> (a2) ->
 -- @tparam table T Node tree (side).
 -- @tparam table argl Argument list.
 -- @tparam table cache Cache.
+-- @tparam table msg Table with error messages.
 -- @treturn table The filtered argument list.
-checkSide = (T, argl, cache) ->
+checkSide = (T, argl, cache, msg) ->
   arg_x = {}
   for i, arg in ipairs argl
     p "argx", i, (typeof arg), y arg
@@ -123,7 +125,7 @@ checkSide = (T, argl, cache) ->
         msg.expected_table i, (resolveCache ns[1], cache), (resolveCache ns[2], cache) unless (verifyTable ns, cache) arg
         arg_x[i] = arg
       elseif ns.__appl
-        msg.expected i, ns, typeof arg unless (verifyAppl ns, cache, i) arg
+        msg.expected i, ns, typeof arg unless (verifyAppl ns, cache, i, msg) arg
         arg_x[i] = arg
       elseif ns.__fn
         switch type1 arg
@@ -154,7 +156,7 @@ applyArguments = (constructor) -> (argl, cache={}) ->
   p c yellow.."@ Applying arguments to #{constructor.signature}"
   die1  = die constructor
   warn1 = warn constructor
-  msg   = {k, (v die1, warn1) for k, v in pairs msg}
+  msg   = {k, (v die1, warn1) for k, v in pairs msg_}
   -- Tree elements
   tree = constructor.tree
   L, R = tree.left, tree.right
@@ -169,7 +171,7 @@ applyArguments = (constructor) -> (argl, cache={}) ->
   unless (isTable R) and R.__multi
     R = {R}
   -- Next, check that all arguments are the expected type or compatible.
-  arg_i = checkSide L, argl, cache
+  arg_i = checkSide L, argl, cache, msg
   p "full-argi", y arg_i
   p c blue.."============"
   -- Now run the function
@@ -178,7 +180,7 @@ applyArguments = (constructor) -> (argl, cache={}) ->
   p c blue.."============"
   -- Now run the function
   -- Typecheck the returned values
-  arg_o = checkSide R, retv, cache
+  arg_o = checkSide R, retv, cache, msg
   p "argo-full", y arg_o
   return (unpack or table.unpack) arg_o
 
