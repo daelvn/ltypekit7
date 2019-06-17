@@ -223,6 +223,28 @@ kindof = setmetatable {
   __call: (a) => @.resolve a, @resolvers
 }
 
+--- Sets a `__cons` metamethod for a table. Only used internally.
+-- @tparam string c Constructor name
+-- @tparam table t Table to apply the metamethod to.
+metacons = (c) -> (t) ->
+  if x = getmetatable t
+    x.__cons = c
+  else
+    setmetatable t, { __cons: c }
+  return t
+
+--- Returns the `__cons` metamethod for a table. Only used internally.
+-- @tparam table t Table to get the metamethod from.
+metaconsFor = (t) ->
+  if x = getmetatable t
+    x.__cons
+  else
+    false
+
+--- Returns true or false depending on whether the value passed is a constructor or not.
+-- @param x Any value.
+isConstructor = (x) -> true if ("Table" == type1 x) and (metaconsFor x) else false
+
 --- Verifies the structure of a list. **Curried function.**
 -- @tparam table struct Structure of the list.
 -- @tparam table cache Cache table to be updated. Defaults to an empty table. Passed alongside struct.
@@ -275,5 +297,5 @@ verifyTable = (struct, cache) -> (t) ->
 {
   :typeof, :hasMeta, :isIO, :metatype, :metakind, :metakindFor, :metacall, :type1, :kindof
   :isString, :isNumber, :isBoolean, :isTable, :isNil, :isThread, :isUserdata, :isFunction
-  :verifyList, :verifyTable, :metaindex
+  :verifyList, :verifyTable, :metaindex, :metacons, :metaconsFor, :isConstructor
 }

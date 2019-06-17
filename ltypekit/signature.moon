@@ -30,6 +30,7 @@ isLower  = (s) -> s\match "^%l"
 -- @treturn table Parts of the type application.
 applSplit = (appl) ->
   return appl if (type appl) != "string"
+  return appl if appl\match "[-=]>"
   x = [part for part in appl\gmatch "%S+"]
   x.__appl = true
   setmetatable x, __tostring: => table.concat @, " "
@@ -118,11 +119,9 @@ binarize = (signature, context={}) ->
     signature = \gsub " *%-> *",   "->"
     signature = \gsub " *%=> *",   "=>"
     signature = \gsub ",%s",       ","
-    print "bef", signature
     signature = \gsub "^%(([^>]-)%) *", (name) ->
       sigName = name
       ""
-    print "pos", signature
   signature = removeTopMostParens signature
   local getNext
   -- Tree structure
@@ -379,5 +378,7 @@ if DEBUG
   --print annotatePar "a", {"Ord a"}
   --print annotatePar "b", {}
   --print y ((annotate rbinarize "() (a -> b) -> [a] -> [b]") rbinarize "() (Int -> String) -> [Int] -> [String]") {}
-  print ""
+  print "fromMaybe", y rbinarize "(fromMaybe) a -> Maybe a -> a"
+  print "isJust", y rbinarize "(isJust) Maybe a -> Boolean"
+  print "Just", y rbinarize "(Just) a -> Maybe a"
 { :contextSplit, :removeTopMostParens, :applToPattern, :binarize, :rbinarize, :annotatePar, :compareAppl, :compare, :annotate }

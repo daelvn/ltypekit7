@@ -74,9 +74,11 @@ verifyAppl = (a1, cache, i, msg) -> (a2) ->
   -- applications have a __tostring method
   msg.expected i, a1, typeof a2 unless main == typeof a2
   --
+  p "appl1/2", (y a1), (y a2)
   for j=2, #a1
     param  = a1[j]
-    xparam = a2[j]
+    xparam = a2[j-1]
+    p "p/xparam", j, param, xparam
     if param\match "^%l"
       if cache[param]
         msg.reading_from_cache param, cache[param], typeof xparam

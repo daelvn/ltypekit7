@@ -26,8 +26,9 @@ addReference = (ref) -> _G.__ref[ref.name] = ref
 -- @tparam string type_ Name of the type.
 -- @tparam string name Name of the constructor.
 -- @tparam string cons Constructor string.
+-- @tparam table parent Parent type for the constructor.
 -- @treturn function Constructor.
-makeConstructor = (type_, name, cons) ->
+makeConstructor = (type_, name, cons, parent) ->
   -- Examples of constructor strings.
   --   "String"          : Requires a single string.
   --   "String String"   : Requires two strings.
@@ -60,17 +61,26 @@ makeConstructor = (type_, name, cons) ->
     c = sign signature
     f = (...) ->
       p "constructing-with", y {...}
-      (metatype type_) (metakind name) {...}
+      t        = (metatype type_) (metakind name) {...}
+      t.name   = name
+      t.parent = parent
+      return t
     return (c collect f, #ordered), records
   else
-    return ((metatype type_) (metakind name) {:name}), {}
+    return ((metatype type_) (metakind name) {:name, :parent}), {}
+
+--- Creates a list of expected parameters.
+-- @tparam string annot Annotation for a constructor.
+getListFor = (annot) ->
+  parts = [word for word in annot\gmatch "%S+"]
+  return for part in *parts[2,] do part
 
 --- Creates a new type.
 -- @tparam string name Name for the new type.
 -- @tparam table|string constructorl List of constructors to use, or a single constructor string.
 -- @treturn Type Newly created type.
 data = (name, constructorl) ->
-  this           = { :name }
+  this           = { :name, constructors: {} }
   __this         = { __ref: {}, __type: "Type", __kind: name }
   __this.__index = __this.__ref
   switch type constructorl
@@ -78,10 +88,12 @@ data = (name, constructorl) ->
       __this.__call = (...) =>
         f, records = makeConstructor name, name, constructorl
         for k,r in pairs records do __this.__ref[k] = r
+        constructors[name] = getListFor constructorl
         f ...
     when "table"
       for constructor, annot in pairs constructorl
         __this.__ref[constructor] = makeConstructor name, constructor, annot
+        constructors[constructor] = getListFor annot
         addReference __this.__ref[constructor] if _G.__ref
   setmetatable this, __this
 
@@ -104,4 +116,4 @@ Maybe = data "Maybe",
 --p y Maybe.Nothing
 --p y nothing
 
-{ :addReference, :data }
+{ :addReference, :data, :getListFor }
