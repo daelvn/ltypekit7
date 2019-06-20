@@ -33,12 +33,15 @@
 <h2>Contents</h2>
 <ul>
 <li><a href="#Functions">Functions</a></li>
+<li><a href="#Tables">Tables</a></li>
 </ul>
 
 
 <h2>Modules</h2>
 <ul class="nowrap">
+  <li><a href="../modules/config.html">config</a></li>
   <li><a href="../modules/init.html">init</a></li>
+  <li><a href="../modules/match.html">match</a></li>
   <li><strong>sign</strong></li>
   <li><a href="../modules/signature.html">signature</a></li>
   <li><a href="../modules/type.html">type</a></li>
@@ -74,6 +77,14 @@
 	<td class="summary">Resolves a type using the cache, only for display purposes.</td>
 	</tr>
 	<tr>
+	<td class="name" nowrap><a href="#verifyAppl">verifyAppl (a1, cache, i, msg, a2)</a></td>
+	<td class="summary">Verifies a type application.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checkSide">checkSide (T, argl, cache, msg)</a></td>
+	<td class="summary">Checks the values of a side for <a href="../modules/sign.html#applyArguments">applyArguments</a>.</td>
+	</tr>
+	<tr>
 	<td class="name" nowrap><a href="#applyArguments">applyArguments (constructor, argl, cache)</a></td>
 	<td class="summary">Applies arguments to to a function and checks the types of the inputs and outputs.</td>
 	</tr>
@@ -84,6 +95,13 @@
 	<tr>
 	<td class="name" nowrap><a href="#impure">impure (f)</a></td>
 	<td class="summary">Makes a function "impure".</td>
+	</tr>
+</table>
+<h2><a href="#Tables">Tables</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#msg_">msg_</a></td>
+	<td class="summary">A table to contain all debug, warning, and error messages.</td>
 	</tr>
 </table>
 
@@ -122,6 +140,88 @@
 
 </dd>
     <dt>
+    <a name = "verifyAppl"></a>
+    <strong>verifyAppl (a1, cache, i, msg, a2)</strong>
+    </dt>
+    <dd>
+    Verifies a type application.  <strong>Curried function.</strong>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a1</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Base application.
+        </li>
+        <li><span class="parameter">cache</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Cache. Passed alongside a1.
+        </li>
+        <li><span class="parameter">i</span>
+            <span class="types"><span class="type">number</span></span>
+         Argument number. Passed alongside a1.
+        </li>
+        <li><span class="parameter">msg</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Table with error messages.
+        </li>
+        <li><span class="parameter">a2</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Application to compare against.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        Whether it could compare.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checkSide"></a>
+    <strong>checkSide (T, argl, cache, msg)</strong>
+    </dt>
+    <dd>
+    Checks the values of a side for <a href="../modules/sign.html#applyArguments">applyArguments</a>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">T</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Node tree (side).
+        </li>
+        <li><span class="parameter">argl</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Argument list.
+        </li>
+        <li><span class="parameter">cache</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Cache.
+        </li>
+        <li><span class="parameter">msg</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Table with error messages.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        The filtered argument list.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
     <a name = "applyArguments"></a>
     <strong>applyArguments (constructor, argl, cache)</strong>
     </dt>
@@ -152,17 +252,6 @@
         ...
     </ol>
 
-    <h3>Raises:</h3>
-       (#2) Did not pass enough arguments to function. <br/>
-   (#3,#4,#10,#11) Wrong type passed as argument. <br/>
-   (#5,#14) Type does not start with a letter. <br/>
-   (#6) Wrong list passed as argument. <br/>
-   (#7) Wrong table passed as argument. <br/>
-   (#9) Function passed does not match. <br/>
-   (#12,#13,#19,#20) Wrong type for return value. <br/>
-   (#15) Wrong list returned. <br/>
-   (#16) Wrong table returned. <br/>
-   (#18) Function returned does not match.
 
 
 
@@ -234,13 +323,61 @@ printx! <span class="string">"string"</span></pre>
 
 </dd>
 </dl>
+    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "msg_"></a>
+    <strong>msg_</strong>
+    </dt>
+    <dd>
+    A table to contain all debug, warning, and error messages.
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">reading_from_cache</span>
+         <code>(f,w) -&gt; (name, is, got) -&gt; ...</code>
+        </li>
+        <li><span class="parameter">saving_in_cache</span>
+         <code>(f,w) -&gt; (name, becomes) -&gt; ...</code>
+        </li>
+        <li><span class="parameter">modifying_cache</span>
+         <code>(f,w) -&gt; (from_) -&gt; (to) -&gt; ...</code>
+        </li>
+        <li><span class="parameter">expected_cache</span>
+         <code>(f,w) -&gt; (i, type_, name, got) -&gt; ...</code>
+        </li>
+        <li><span class="parameter">expected</span>
+         <code>(f,w) -&gt; (i, type_, name) -&gt; ...</code>
+        </li>
+        <li><span class="parameter">expected_list</span>
+         <code>(f,w) -&gt; (i, type_, name) -&gt; ...</code>
+        </li>
+        <li><span class="parameter">expected_table</span>
+         <code>(f,w) -&gt; (i, key, value) -&gt; ...</code>
+        </li>
+        <li><span class="parameter">malformed</span>
+         <code>(f,w) -&gt; (name) -&gt; ...</code>
+        </li>
+        <li><span class="parameter">unknown_signature</span>
+         <code>(f,w) -&gt; (i) -&gt; ...</code>
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2019-06-13 20:47:32 </i>
+<i style="float:right;">Last updated 2019-06-20 23:42:41 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

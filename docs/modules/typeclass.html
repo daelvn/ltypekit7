@@ -38,7 +38,9 @@
 
 <h2>Modules</h2>
 <ul class="nowrap">
+  <li><a href="../modules/config.html">config</a></li>
   <li><a href="../modules/init.html">init</a></li>
+  <li><a href="../modules/match.html">match</a></li>
   <li><a href="../modules/sign.html">sign</a></li>
   <li><a href="../modules/signature.html">signature</a></li>
   <li><a href="../modules/type.html">type</a></li>
@@ -74,8 +76,20 @@
 	<td class="summary">Adds a new reference in <code>_G.__ref</code></td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#makeConstructor">makeConstructor (type_, name, cons)</a></td>
+	<td class="name" nowrap><a href="#parseConstructor">parseConstructor (type_, name, cons, dorecords, doaddrefs)</a></td>
+	<td class="summary">Parses a constructor out of a constructor string.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#makeConstructor">makeConstructor (type_, name, cons, parent)</a></td>
 	<td class="summary">Creates a new constructor function out of a constructor string.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#getListFor">getListFor (annot)</a></td>
+	<td class="summary">Creates a list of expected parameters.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#generateSavePairing">generateSavePairing (constructor, tail)</a></td>
+	<td class="summary">Associate indexes in a value of a certain type to the name of the values they should be saved under.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#data">data (name, constructorl)</a></td>
@@ -112,8 +126,45 @@
 
 </dd>
     <dt>
+    <a name = "parseConstructor"></a>
+    <strong>parseConstructor (type_, name, cons, dorecords, doaddrefs)</strong>
+    </dt>
+    <dd>
+    Parses a constructor out of a constructor string.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">type_</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The type that should be returned by the constructor.
+        </li>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The name of the constructor.
+        </li>
+        <li><span class="parameter">cons</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The annotation of the constructor.
+        </li>
+        <li><span class="parameter">dorecords</span>
+            <span class="types"><span class="type">boolean</span></span>
+         Defaults to true. Set to false if you do not want record functions to be produced.
+        </li>
+        <li><span class="parameter">doaddrefs</span>
+            <span class="types"><span class="type">boolean</span></span>
+         Defaults to true. Set to false if you do not want record functions to be added to <code>_G.__ref</code>
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
     <a name = "makeConstructor"></a>
-    <strong>makeConstructor (type_, name, cons)</strong>
+    <strong>makeConstructor (type_, name, cons, parent)</strong>
     </dt>
     <dd>
     Creates a new constructor function out of a constructor string.
@@ -133,6 +184,10 @@
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
          Constructor string.
         </li>
+        <li><span class="parameter">parent</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Parent type for the constructor.
+        </li>
     </ul>
 
     <h3>Returns:</h3>
@@ -144,6 +199,69 @@
 
 
 
+
+</dd>
+    <dt>
+    <a name = "getListFor"></a>
+    <strong>getListFor (annot)</strong>
+    </dt>
+    <dd>
+    Creates a list of expected parameters.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">annot</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Annotation for a constructor.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        Expected parameters.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "generateSavePairing"></a>
+    <strong>generateSavePairing (constructor, tail)</strong>
+    </dt>
+    <dd>
+    Associate indexes in a value of a certain type to the name of the values they should be saved under.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">constructor</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The constructor string that generated the value.
+        </li>
+        <li><span class="parameter">tail</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Names for each of the values in positional order.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        The generated save pairing.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">generateSavePairing <span class="string">"Point Number Number"</span>, {<span class="string">"_"</span>, <span class="string">"a"</span>}
+generateSavePairing <span class="string">"Point2 x:Number y:Number"</span>, {<span class="string">"Number"</span>, <span class="string">"c"</span>}</pre>
+    </ul>
 
 </dd>
     <dt>
@@ -184,7 +302,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2019-06-13 20:47:32 </i>
+<i style="float:right;">Last updated 2019-06-20 23:42:41 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

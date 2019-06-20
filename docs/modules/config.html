@@ -32,14 +32,14 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Functions">Functions</a></li>
+<li><a href="#Tables">Tables</a></li>
 </ul>
 
 
 <h2>Modules</h2>
 <ul class="nowrap">
-  <li><a href="../modules/config.html">config</a></li>
-  <li><strong>init</strong></li>
+  <li><strong>config</strong></li>
+  <li><a href="../modules/init.html">init</a></li>
   <li><a href="../modules/match.html">match</a></li>
   <li><a href="../modules/sign.html">sign</a></li>
   <li><a href="../modules/signature.html">signature</a></li>
@@ -56,24 +56,24 @@
 
 <div id="content">
 
-<h1>Module <code>init</code></h1>
-<p>Main functions of the module, required for interoperation between them, or to enable optional features.</p>
+<h1>Module <code>config</code></h1>
+<p>Project-wide configuration for ltypekit</p>
 <p>
 
 </p>
     <h3>Info:</h3>
     <ul>
-        <li><strong>Copyright</strong>: 12.06.2019</li>
+        <li><strong>Copyright</strong>: 20.06.2019</li>
         <li><strong>License</strong>: MIT</li>
         <li><strong>Author</strong>: daelvn</li>
     </ul>
 
 
-<h2><a href="#Functions">Functions</a></h2>
+<h2><a href="#Tables">Tables</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#doGlobal">doGlobal ()</a></td>
-	<td class="summary">Enables the use of global referencing</td>
+	<td class="name" nowrap><a href="#config">config</a></td>
+	<td class="summary">Table returned with all the config fields.</td>
 	</tr>
 </table>
 
@@ -81,29 +81,27 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
 
     <dl class="function">
     <dt>
-    <a name = "doGlobal"></a>
-    <strong>doGlobal ()</strong>
+    <a name = "config"></a>
+    <strong>config</strong>
     </dt>
     <dd>
-    Enables the use of global referencing
+    Table returned with all the config fields.
 
 
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
-        <code>_G</code>
-    </ol>
-
-
-    <h3>See also:</h3>
+    <h3>Fields:</h3>
     <ul>
+        <li><span class="parameter">DEBUG</span>
+            <span class="types"><span class="type">boolean</span></span>
+         The debug flag for the whole project.
+        </li>
     </ul>
+
+
+
 
 
 </dd>

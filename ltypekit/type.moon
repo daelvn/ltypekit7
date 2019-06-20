@@ -165,7 +165,7 @@ metacall = (f) -> (t) ->
   return t
 
 --- Sets an `__index` metamethod for a table.
--- @tparam function|table f A function or table for indexing.
+-- @tparam function|table ft A function or table for indexing.
 -- @tparam table t Table to set the metamethod for.
 metaindex = (ft) -> (t) ->
   if x = getmetatable t
