@@ -7,6 +7,7 @@
 -- @copyright 16.06.2019
 import DEBUG                                  from require "ltypekit.config"
 import hasMeta, typeof, kindof, isConstructor from require "ltypekit.type"
+import generateSavePairing                    from require "ltypekit.typeclass"
 
 local y, c, p
 if DEBUG
@@ -20,9 +21,63 @@ else
 head = (t) -> t[1]
 tail = (t) -> return for x in *t[2,] do x
 
+setfenv or= (fn, env) ->
+  i = 1
+  while true do
+    name = debug.getupvalue fn, i
+    if name == "_ENV"
+      debug.upvaluejoin fn, i, (-> env), 1
+    elseif not name
+      break
+    i += 1
+  fn
+
+--- Compares a value and a case
+-- @param v Any value.
+-- @tparam table c The case to compare against.
+-- @treturn boolean Returns whether it matches or not.
+-- @treturn nil|table If the mode of the case is `match-patterns`, it additionally returns a table of parameters and their corresponding values.
+compareCase = (v, c) ->
+  switch c.__mode
+    when "unknown"
+      error "compareCase $ Comparison method is not specified"
+    when "match-value"
+      return false if (typeof v) != c.type
+      return false if v          != c.value
+      true, nil
+    when "match-kind"
+      return false if (kindof v) != c.kind
+      true, nil
+    when "match-patterns"
+      save = {}
+      for key, target in pairs c.save
+        if target\match "^%l"
+          save[target] = v[key]
+        elseif target\match "^%u"
+          return false if (typeof v[key]) != target
+      true, save
+    else
+      error "compareCase $ Unknown comparison method."
+
 --- Puts a value or case into custom objects that share the same `__eq` function.
-Comparable = (x) ->
-  if x.__case
+Comparable = (x) -> setmetatable x,
+  __eq: (t) =>
+    if @__base
+      for case_, f in pairs t
+        continue if case_ == "__base"
+        ok, sv = compareCase case_, @[1]
+        continue unless ok
+        setfenv f, setmetatable (sv or {}), {__index: _G}
+        return f!
+    elseif @__against
+      for case_, f in pairs @
+        continue if case_ == "__against"
+        ok, sv = compareCase case_, t[1]
+        continue unless ok
+        setfenv f, setmetatable (sv or {}), {__index: _G}
+        return f!
+    else
+      error "Comparable $ The element passed to Comparable cannot be compared."
 
 --- Creates a case for the pattern matching.
 case = (...) ->
@@ -50,7 +105,7 @@ case = (...) ->
         this.__mode = "match-patterns"
         this.const  = hd.name
         this.type   = hd.parent.name
-        this.save   = generateSavePairing hd.parent.constructors[hd.name]
+        this.save   = generateSavePairing hd.parent.constructors[hd.name], tl
       else
         -- Match value, again.
         this.__mode = "match-value"
@@ -58,7 +113,12 @@ case = (...) ->
         this.value  = jd
 
 --- Given a value and a list of patterns, it calls the function which matches the pattern first.
-match = (v, cl) -> v, cl
+match = (v, cl) ->
+  for case_, f in pairs cl
+    ok, sv = compareCase case_, v
+    continue unless ok
+    setfenv f, setmetatable (sv or {}), {__index: _G}
+    return f!
 
 fromMaybe = sign "a -> Maybe a -> a"
 fromMaybe (d) -> (x) -> match x,
