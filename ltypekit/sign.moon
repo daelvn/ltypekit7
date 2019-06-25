@@ -61,6 +61,8 @@ msg_ =
     f "Malformed type #{name}."
   unknown_signature: (f,w) -> (i) ->
     w "Argument ##{i} has no known signature."
+  autosign: (f,w) -> (i, sn) ->
+    w "Automatically signing ##{i} with signature '#{sn}'. This may cause unintended behaviour."
 
 --- Verifies a type application. **Curried function.**
 -- @tparam table a1 Base application.
@@ -92,13 +94,18 @@ verifyAppl = (a1, cache, i, msg) -> (a2) ->
       msg.malformed param
   true
 
+-- TODO If given `Nothing`, which is `Maybe a`, in a signature. It should be applied so that `Nothing` becomes `Nothing @a`.
+-- So, it knows the type its value *should* have, despite having a value. Types aren't supposed to exist at runtime but
+-- we all know this is a mess anyway.
+
 --- Checks the values of a side for `applyArguments`.
 -- @tparam table T Node tree (side).
 -- @tparam table argl Argument list.
 -- @tparam table cache Cache.
 -- @tparam table msg Table with error messages.
+-- @tparam string isLR Whether it is the `L`eft or `R`ight side.
 -- @treturn table The filtered argument list.
-checkSide = (T, argl, cache, msg) ->
+checkSide = (T, argl, cache, msg, isLR) ->
   arg_x = {}
   for i, arg in ipairs argl
     p "argx", i, (typeof arg), y arg
@@ -132,8 +139,12 @@ checkSide = (T, argl, cache, msg) ->
       elseif ns.__fn
         switch type1 arg
           when "Function"
-            msg.unknown_signature i
-            arg_x[i] = arg
+            if isLR == "L"
+              msg.unknown_signature i
+              arg_x[i] = arg
+            elseif isLR == "R"
+              msg.autosign i, ns.__sig
+              arg_x[i] = (sign ns.__sig, {}, cache) arg
           when "Table"
             if "TypeKit" == kindof arg
               msg.expected i, ns.__sig, (arg.__sig or "unknown") unless (compare ns) arg.tree
@@ -173,7 +184,7 @@ applyArguments = (constructor) -> (argl, cache={}) ->
   unless (isTable R) and R.__multi
     R = {R}
   -- Next, check that all arguments are the expected type or compatible.
-  arg_i = checkSide L, argl, cache, msg
+  arg_i = checkSide L, argl, cache, msg, "L"
   p "full-argi", y arg_i
   p c blue.."============"
   -- Now run the function
@@ -182,7 +193,7 @@ applyArguments = (constructor) -> (argl, cache={}) ->
   p c blue.."============"
   -- Now run the function
   -- Typecheck the returned values
-  arg_o = checkSide R, retv, cache, msg
+  arg_o = checkSide R, retv, cache, msg, "R"
   p "argo-full", y arg_o
   return (unpack or table.unpack) arg_o
 
@@ -205,6 +216,7 @@ sign = (signature, context={}, cache) ->
     safe:   false
     silent: false
   }, {
+    __name: tree.name
     __type: "SignedConstructor"
     __kind: "TypeKit"
     __call: (...) =>

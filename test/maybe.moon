@@ -2,6 +2,7 @@
 -- It is truly cursed, I am aware.
 import data         from require "ltypekit.typeclass"
 import sign, impure from require "ltypekit.sign"
+import match, case  from require "ltypekit.match"
 import doGlobal     from require "ltypekit"
 import DEBUG        from require "ltypekit.config"
 
@@ -26,13 +27,16 @@ isJust (x) -> switch x
   when x       then true
 
 fromMaybe = sign "(fromMaybe) a -> Maybe a -> a"
-fromMaybe (d) -> (x) -> switch x
-  when Nothing then d
-  when x       then x
+fromMaybe (d) -> (x) -> match x,
+  [case Nothing]:   ->
+    print "nada"
+    d
+  [case Just, "a"]: ->
+    print "todo"
+    a
 
-p! isJust Just 5
-p! isJust Nothing
-
-def5 = fromMaybe 5
-p! y def5 Just 6
-p! y def5 Nothing
+juststr = Just "is string"
+print 2
+-- Nothing becomes Nothing @string
+p! y (fromMaybe "no string") Nothing
+print 4

@@ -4,10 +4,10 @@
 -- @license MIT
 -- @copyright 10.06.2019
 unpack or= table.unpack
-import sign               from require "ltypekit.sign"
-import reverse, collect   from require "ltypekit.util"
-import metatype, metakind from require "ltypekit.type"
-import DEBUG              from require "ltypekit.config"
+import sign                             from require "ltypekit.sign"
+import reverse, collect, mergemetatable from require "ltypekit.util"
+import metatype, metakind, metacons     from require "ltypekit.type"
+import DEBUG                            from require "ltypekit.config"
 
 local y, c, p
 if DEBUG
@@ -20,7 +20,10 @@ else
 
 --- Adds a new reference in `_G.__ref`
 -- @tparam table ref Reference to store in `_G`
-addReference = (ref) -> _G.__ref[ref.name] = ref
+addReference = (ref) ->
+  p y ref
+  p y _G.__ref
+  _G.__ref[(getmetatable ref).__name] = ref
 
 --- Parses a constructor out of a constructor string.
 -- @tparam string type_ The type that should be returned by the constructor.
@@ -60,6 +63,9 @@ parseConstructor = (type_, name, cons, dorecords=true, doaddrefs=true) ->
   --
   signature, records, ordered, index2r
 
+-- TODO Constructor values can have some unaccessible values, restricted by __index. That means that everything must be put
+-- behind a proxy table, that way we avoid stuff like `v == (Just v)[1]`. I'd have to check the side effects of that.
+
 --- Creates a new constructor function out of a constructor string.
 -- @tparam string type_ Name of the type.
 -- @tparam string name Name of the constructor.
@@ -73,13 +79,12 @@ makeConstructor = (type_, name, cons, parent) ->
     c = sign signature
     f = (...) ->
       p "constructing-with", y {...}
-      t        = (metatype type_) (metakind name) {...}
-      t.name   = name
-      t.parent = parent
+      t = (mergemetatable {__name: name, __parent: parent}) (metatype type_) (metakind name) {...}
+      p "constructed", y t
       return t
-    return (c collect f, #ordered), records
+    return ((mergemetatable {__parent: parent}) (metacons name) (c collect f, #ordered)), records
   else
-    return ((metatype type_) (metakind name) {:name, :parent}), {}
+    return ((mergemetatable {__name: name, __parent: parent}) (metacons name) (metatype type_) (metakind name) {}), {}
 
 --- Creates a list of expected parameters.
 -- @tparam string annot Annotation for a constructor.
@@ -96,15 +101,18 @@ getListFor = (annot) ->
 --   generateSavePairing "Point Number Number", {"_", "a"} 
 --   generateSavePairing "Point2 x:Number y:Number", {"Number", "c"}
 generateSavePairing = (constructor, tail) ->
-  name, rest         = constructor\match "%((.-)%)%s*(.+)"
+  p "savepair", y constructor
+  name, rest         = constructor\match "(.-)%s*(.+)"
+  p (y constructor), (y name), (y rest)
   _, _, ordered, i2r = parseConstructor "", name, rest, false
+  p "savepair-r", (y ordered), (y i2r)
   save               = {}
   for i, arg in ipairs tail
     continue if arg == "_"
     if r = i2r[i] -- this means that it's indexed using a record
       save[r] = arg
     else -- a normal index
-      save[i] = i
+      save[i] = arg
   save
 
 --- Creates a new type.
@@ -112,46 +120,31 @@ generateSavePairing = (constructor, tail) ->
 -- @tparam table|string constructorl List of constructors to use, or a single constructor string.
 -- @treturn Type Newly created type.
 data = (name, constructorl) ->
-  this           = { :name, constructors: {} }
-  __this         = { __ref: {}, __type: "Type", __kind: name }
+  this           = { constructors: {} }
+  __this         = { __name: name, __ref: {}, __type: "Type", __kind: name }
   __this.__index = __this.__ref
   switch type constructorl
     when "string"
       __this.__call = (...) =>
-        f, records = makeConstructor name, name, constructorl
+        f, records = makeConstructor name, name, constructorl, this
         for k,r in pairs records do __this.__ref[k] = r
-        constructors[name] = do
-          w = getListFor constructorl
-          table.insert w, 1, name
-          w
+        this.constructors[name] = do
+          p "constructorl", y constructorl
+          --w = getListFor constructorl
+          --table.insert w, 1, name
+          --table.concat w, " "
+          name .. ((constructorl != " ") and (" " .. constuctorl) or "")
         f ...
     when "table"
       for constructor, annot in pairs constructorl
-        __this.__ref[constructor] = makeConstructor name, constructor, annot
-        constructors[constructor] = do
-          w = getListFor annot
-          table.insert w, 1, name
-          w
+        __this.__ref[constructor] = makeConstructor name, constructor, annot, this
+        this.constructors[constructor] = do
+          p "annot", y annot
+          --w = getListFor annot
+          --table.insert w, 1, name
+          --table.concat w, " "
+          name .. ((annot != " ") and (" " .. annot) or "")
         addReference __this.__ref[constructor] if _G.__ref
   setmetatable this, __this
-
-Maybe = data "Maybe",
-  Nothing: ""
-  Just:    "a"
-
---f = sign "Int -> Maybe Int"
---f (x) -> switch x
---  when 0 then Nothing
---  when x then Just x
-
---f (x) -> switch x
---  when 0 then Maybe.Nothing
---  when x then Maybe.Just x
-
---just    = Maybe.Just 5
---p y just
---nothing = Maybe.Nothing
---p y Maybe.Nothing
---p y nothing
 
 { :addReference, :data, :getListFor, :generateSavePairing }

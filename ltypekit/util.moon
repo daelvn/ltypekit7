@@ -3,7 +3,8 @@
 -- @author daelvn
 -- @license MIT
 -- @copyright 13.05.2019
-color = (require "ansicolors") or ((x) -> x\gsub "%%%b{}","")
+color   = (require "ansicolors") or ((x) -> x\gsub "%%%b{}","")
+inspect = (require "inspect") or ((x) -> tostring x)
 
 --- Prints a simple warning.
 -- @tparam string s Error message.
@@ -88,4 +89,17 @@ collect = (f, depth, ...) ->
     else
       return collect f, depth-1, x, unpack argl
 
-{ :warnS, :panicS, :traceback, :tracebackWarn, :die, :warn, :reverse, :collect }
+--- Merges the table passed with the metatable of another. **Curried function**.
+-- @tparam table mt The metatable to merge
+-- @tparam table t The table to merge the metatable with.
+-- @treturn table The table to which the method was applied.
+mergemetatable = (mt) -> (t) ->
+  if x = getmetatable t
+    for k, v in pairs mt do x[k] = v
+  else
+    setmetatable t, mt
+  t
+
+print "test mergemetatable", inspect (mergemetatable {c: 5}) setmetatable {a: 1}, {b: 2}
+
+{ :warnS, :panicS, :traceback, :tracebackWarn, :die, :warn, :reverse, :collect, :mergemetatable }

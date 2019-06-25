@@ -378,7 +378,10 @@ if DEBUG
   --print annotatePar "a", {"Ord a"}
   --print annotatePar "b", {}
   --print y ((annotate rbinarize "() (a -> b) -> [a] -> [b]") rbinarize "() (Int -> String) -> [Int] -> [String]") {}
-  print "fromMaybe", y rbinarize "(fromMaybe) a -> Maybe a -> a"
-  print "isJust", y rbinarize "(isJust) Maybe a -> Boolean"
-  print "Just", y rbinarize "(Just) a -> Maybe a"
-{ :contextSplit, :removeTopMostParens, :applToPattern, :binarize, :rbinarize, :annotatePar, :compareAppl, :compare, :annotate }
+  --print "fromMaybe", y rbinarize "(fromMaybe) a -> Maybe a -> a"
+  --print "isJust", y rbinarize "(isJust) Maybe a -> Boolean"
+  --print "Just", y rbinarize "(Just) a -> Maybe a"
+  --print y rbinarize "a -> (a -> c) -> c"
+  { :contextSplit, :removeTopMostParens, :applToPattern, :binarize, :rbinarize, :annotatePar, :compareAppl, :compare, :annotate }
+else
+  { :contextSplit, :removeTopMostParens, :applToPattern, :binarize, :rbinarize, :annotatePar, :compareAppl, :compare, :annotate }

@@ -5,9 +5,9 @@
 -- @author daelvn
 -- @license MIT
 -- @copyright 16.06.2019
-import DEBUG                                  from require "ltypekit.config"
-import hasMeta, typeof, kindof, isConstructor from require "ltypekit.type"
-import generateSavePairing                    from require "ltypekit.typeclass"
+import DEBUG                                               from require "ltypekit.config"
+import hasMeta, typeof, kindof, isConstructor, metaconsFor from require "ltypekit.type"
+import generateSavePairing                                 from require "ltypekit.typeclass"
 
 local y, c, p
 if DEBUG
@@ -38,6 +38,7 @@ setfenv or= (fn, env) ->
 -- @treturn boolean Returns whether it matches or not.
 -- @treturn nil|table If the mode of the case is `match-patterns`, it additionally returns a table of parameters and their corresponding values.
 compareCase = (v, c) ->
+  p "using case", y c
   switch c.__mode
     when "unknown"
       error "compareCase $ Comparison method is not specified"
@@ -50,7 +51,9 @@ compareCase = (v, c) ->
       true, nil
     when "match-patterns"
       save = {}
+      return false if (kindof v) != c.const
       for key, target in pairs c.save
+        p "matchpat", key, target, y save
         if target\match "^%l"
           save[target] = v[key]
         elseif target\match "^%u"
@@ -58,26 +61,6 @@ compareCase = (v, c) ->
       true, save
     else
       error "compareCase $ Unknown comparison method."
-
---- Puts a value or case into custom objects that share the same `__eq` function.
-Comparable = (x) -> setmetatable x,
-  __eq: (t) =>
-    if @__base
-      for case_, f in pairs t
-        continue if case_ == "__base"
-        ok, sv = compareCase case_, @[1]
-        continue unless ok
-        setfenv f, setmetatable (sv or {}), {__index: _G}
-        return f!
-    elseif @__against
-      for case_, f in pairs @
-        continue if case_ == "__against"
-        ok, sv = compareCase case_, t[1]
-        continue unless ok
-        setfenv f, setmetatable (sv or {}), {__index: _G}
-        return f!
-    else
-      error "Comparable $ The element passed to Comparable cannot be compared."
 
 --- Creates a case for the pattern matching.
 case = (...) ->
@@ -89,12 +72,27 @@ case = (...) ->
     __mode: "unknown"
   --
   switch typeof hd
-    when "String", "Number", "Function", "Table", "Thread", "Boolean", "Userdata", "Nil"
+    when "String", "Number", "Table", "Thread", "Boolean", "Userdata", "Nil"
       -- Normal type, just expect this
       this.__mode = "match-value"
       this.type   = typeof hd
       this.value  = hd
-    else "Type"
+    when "Function"
+      -- make sure that it's not a constructor
+      p "isactually", y hd
+      if isConstructor hd
+        -- It's a constructor, therefore we have to enable some basic pattern matching.
+        ghd         = getmetatable hd
+        this.__mode = "match-patterns"
+        this.const  = ghd.__name
+        this.type   = ghd.__parent.name
+        this.save   = generateSavePairing ghd.__parent.constructors[ghd.__name], tl
+      else
+        -- Match value, again.
+        this.__mode = "match-value"
+        this.type   = typeof hd
+        this.value  = hd
+    when "Type"
       -- wait that's illegal
       -- That means we should expect *actually* the kind.
       this.__mode = "match-kind"
@@ -102,56 +100,26 @@ case = (...) ->
     else
       if isConstructor hd
         -- It's a constructor, therefore we have to enable some basic pattern matching.
+        ghd         = getmetatable hd
         this.__mode = "match-patterns"
-        this.const  = hd.name
-        this.type   = hd.parent.name
-        this.save   = generateSavePairing hd.parent.constructors[hd.name], tl
+        this.const  = ghd.__name
+        this.type   = ghd.__parent.name
+        p "parent-cons", y ghd.__parent.constructors
+        this.save   = generateSavePairing ghd.__parent.constructors[ghd.__name], tl
       else
         -- Match value, again.
         this.__mode = "match-value"
         this.type   = typeof hd
-        this.value  = jd
+        this.value  = hd
+  this
 
 --- Given a value and a list of patterns, it calls the function which matches the pattern first.
 match = (v, cl) ->
   for case_, f in pairs cl
-    ok, sv = compareCase case_, v
+    ok, sv = compareCase v, case_
     continue unless ok
+    p "sv", y sv
     setfenv f, setmetatable (sv or {}), {__index: _G}
     return f!
 
-fromMaybe = sign "a -> Maybe a -> a"
-fromMaybe (d) -> (x) -> match x,
-  [case Nothing]:   -> d
-  [case Just, "a"]: -> a
-
--- ((fromMaybe 5) Just 6)
-fromMaybe (5) -> (Just 6) -> match (Just 6),
-  [case Nothing]:   -> 5
-  [case Just, "a"]: -> 6
-
-fromMaybe (5) -> (Just 6) -> match (Just 6),
-  [{
-    type:  Maybe
-    const: Nothing
-  }]: -> 5
-  [{
-    type:  Maybe
-    const: Just
-    save:  {
-      [1]: "a"
-    }
-  }]: -> 6
-
-fromMaybe (5) -> (Just 6) -> match (Just 6),
-  [{
-    type:  Maybe
-    const: Nothing
-  }]: -> 5
-  [{
-    type:  Maybe
-    const: Just
-    save:  {
-      [1]: "a"
-    }
-  }]: (setfenv (-> 6), (setmetable {a=6}, {__index=_G}))!
+{ :case, :match }
