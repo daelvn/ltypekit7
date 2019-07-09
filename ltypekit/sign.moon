@@ -3,10 +3,10 @@
 -- @author daelvn
 -- @license MIT
 -- @copyright 13.05.2019
-import rbinarize, compare, annotate                                                from require "ltypekit.signature"
-import typeof, type1, metatype, isTable, isString, verifyList, verifyTable, kindof from require "ltypekit.type"
-import warn, die                                                                   from require "ltypekit.util"
-import DEBUG                                                                       from require "ltypekit.config"
+import rbinarize, compare, annotate                                                                                 from require "ltypekit.signature"
+import typeof, type1, metatype, isTable, isString, verifyList, verifyTable, kindof, typefor, classfor, isInstanceOf from require "ltypekit.type"
+import warn, die                                                                                                    from require "ltypekit.util"
+import DEBUG                                                                                                        from require "ltypekit.config"
 
 local y, c, p
 if DEBUG
@@ -63,6 +63,8 @@ msg_ =
     w "Argument ##{i} has no known signature."
   autosign: (f,w) -> (i, sn) ->
     w "Automatically signing ##{i} with signature '#{sn}'. This may cause unintended behaviour."
+  not_instance_of: (f, w) -> (tag, tc) ->
+    f "Value of #{tag} is not an instance of #{tc}."
 
 --- Verifies a type application. **Curried function.**
 -- @tparam table a1 Base application.
@@ -81,22 +83,22 @@ verifyAppl = (a1, cache, i, msg) -> (a2) ->
     param  = a1[j]
     xparam = a2[j-1]
     p "p/xparam", j, param, xparam
-    if param\match "^%l"
-      if cache[param]
-        msg.reading_from_cache param, cache[param], typeof xparam
-        msg.expected_cache j, cache[param], param, typeof xparam unless cache[param] == typeof xparam
+    if xparam -- Only compare if there's something to compare it to
+      if param\match "^%l"
+        if cache[param]
+          msg.reading_from_cache param, cache[param], typeof xparam
+          msg.expected_cache j, cache[param], param, typeof xparam unless cache[param] == typeof xparam
+        else
+          msg.saving_in_cache param, typeof xparam
+          cache[param] = typeof xparam
+      elseif param\match "^%u"
+        msg.expected j, a1, "#{typeof xparam} (##{j})" unless param == typeof xparam
       else
-        msg.saving_in_cache param, typeof xparam
-        cache[param] = typeof xparam
-    elseif param\match "^%u"
-      msg.expected j, a1, "#{typeof xparam} (##{j})" unless param == typeof xparam
-    else
-      msg.malformed param
+        msg.malformed param
+    else -- Otherwise, the constructor might just not have a value for it.
+      p "no/param"
+      continue
   true
-
--- TODO If given `Nothing`, which is `Maybe a`, in a signature. It should be applied so that `Nothing` becomes `Nothing @a`.
--- So, it knows the type its value *should* have, despite having a value. Types aren't supposed to exist at runtime but
--- we all know this is a mess anyway.
 
 --- Checks the values of a side for `applyArguments`.
 -- @tparam table T Node tree (side).
@@ -104,8 +106,9 @@ verifyAppl = (a1, cache, i, msg) -> (a2) ->
 -- @tparam table cache Cache.
 -- @tparam table msg Table with error messages.
 -- @tparam string isLR Whether it is the `L`eft or `R`ight side.
+-- @tparam table C Context (constraints).
 -- @treturn table The filtered argument list.
-checkSide = (T, argl, cache, msg, isLR) ->
+checkSide = (T, argl, cache, msg, isLR, C) ->
   arg_x = {}
   for i, arg in ipairs argl
     p "argx", i, (typeof arg), y arg
@@ -117,6 +120,9 @@ checkSide = (T, argl, cache, msg, isLR) ->
           msg.reading_from_cache T[i], cache[T[i]], typeof arg
           msg.expected_cache i, cache[T[i]], T[i], typeof arg unless cache[T[i]] == typeof arg
         else
+          -- here goes the context checking
+          if cx = C[T[i]]
+            for tc in *cx do msg.not_instance_of T[i], tc unless (isInstanceOf (classfor tc)) arg
           msg.saving_in_cache T[i], typeof arg
           cache[T[i]] = typeof arg
         arg_x[i] = arg
@@ -184,7 +190,7 @@ applyArguments = (constructor) -> (argl, cache={}) ->
   unless (isTable R) and R.__multi
     R = {R}
   -- Next, check that all arguments are the expected type or compatible.
-  arg_i = checkSide L, argl, cache, msg, "L"
+  arg_i = checkSide L, argl, cache, msg, "L", tree.context
   p "full-argi", y arg_i
   p c blue.."============"
   -- Now run the function
@@ -193,7 +199,7 @@ applyArguments = (constructor) -> (argl, cache={}) ->
   p c blue.."============"
   -- Now run the function
   -- Typecheck the returned values
-  arg_o = checkSide R, retv, cache, msg, "R"
+  arg_o = checkSide R, retv, cache, msg, "R", tree.context
   p "argo-full", y arg_o
   return (unpack or table.unpack) arg_o
 

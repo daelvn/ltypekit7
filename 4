@@ -248,10 +248,6 @@ metaconsFor = (t) ->
 -- @param x Any value.
 isConstructor = (x) -> true if ("Table" == type1 x) and (metaconsFor x) else false
 
---- Resolves a string to a typeclass
--- @table classfor
-classfor = setmetatable {}, __call: (s) => @[s]
-
 --- Checks whether a value is an instance of a typeclass. **Curried function.**
 -- @tparam Typeclass tc The base typeclass.
 -- @param v The value to check.
@@ -316,5 +312,5 @@ verifyTable = (struct, cache) -> (t) ->
   :typeof, :hasMeta, :isIO, :metatype, :metakind, :metakindFor, :metacall, :type1, :kindof
   :isString, :isNumber, :isBoolean, :isTable, :isNil, :isThread, :isUserdata, :isFunction
   :verifyList, :verifyTable, :metaindex, :metacons, :metaconsFor, :isConstructor
-  :typefor, :classfor, :isInstanceOf
+  :typefor
 }

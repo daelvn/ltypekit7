@@ -3,8 +3,14 @@
 -- @author daelvn
 -- @license MIT
 -- @copyright 13.05.2019
-color   = (require "ansicolors") or ((x) -> x\gsub "%%%b{}","")
-inspect = (require "inspect") or ((x) -> tostring x)
+color      = do
+  local _color
+  _color   = ((x) -> x\gsub "%%%b{}","") unless pcall -> _color = require "ansicolors"
+  _color
+inspect    = do
+  local _inspect
+  _inspect = ((x) -> tostring x) unless pcall -> _inspect = require "inspect"
+  _inspect
 
 --- Prints a simple warning.
 -- @tparam string s Error message.
@@ -16,11 +22,10 @@ panicS = (s) -> print color "%{red}[ERROR] #{s}"
 --- Prints a traceback message with details about name, signature, error and stacktrace.
 -- @tparam table self Signed constructor.
 -- @tparam string s Error message.
--- @tparam number n Error number.
-traceback = (s, n) =>
+traceback = (s) =>
   infot = {}
   for i=3,6 do infot[i] = debug.getinfo i
-  print color "%{red}[ERROR] #{s} (##{n})"
+  print color "%{red}[ERROR] #{s}"
   print color "%{white}        In function: %{yellow}#{@tree.name or infot[3].name}%{white}"
   print color "        Signature:   %{green}'#{@signature or "???"}'"
   print color "        Stack traceback:"
@@ -100,6 +105,29 @@ mergemetatable = (mt) -> (t) ->
     setmetatable t, mt
   t
 
-print "test mergemetatable", inspect (mergemetatable {c: 5}) setmetatable {a: 1}, {b: 2}
+--- Extract metamethods from a common table
+-- @tparam table t The table which contains metamethods
+-- @treturn table A table with only metamethods
+extractMeta = (t) ->
+  final = {}
+  for k, v in pairs t
+    if k\match "^__" then final[k] = v
+  final
 
-{ :warnS, :panicS, :traceback, :tracebackWarn, :die, :warn, :reverse, :collect, :mergemetatable }
+--- Selects the first element from all arguments.
+selectFirst = (...) -> select 1, ...
+--- Selects the last element from all arguments.
+selectLast  = (...) ->
+  argl = {...}
+  argl[#argl]
+
+--- Equivalent to `selectFirst` but instead takes a table.
+head = (t) -> selectFirst unpack t
+--- Equivalent to `selectLast` but instead takes a table.
+last = (t) -> selectLast unpack t
+--- Returns a table with all elements but the first.
+tail = (t) -> [v for i, v in ipairs t when i != 1]
+--- Returns a table with all elements but the last.
+init = (t) -> [v for i, v in ipairs t when i != #t]
+
+{ :warnS, :panicS, :traceback, :tracebackWarn, :die, :warn, :reverse, :collect, :mergemetatable, :extractMeta, :selectFirst, :selectLast, :head, :tail, :last, :init }

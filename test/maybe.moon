@@ -35,8 +35,7 @@ fromMaybe (d) -> (x) -> match x,
     print "todo"
     a
 
-juststr = Just "is string"
-print 2
 -- Nothing becomes Nothing @string
+p! y (fromMaybe "no string") Just "is string"
 p! y (fromMaybe "no string") Nothing
 print 4

@@ -4,10 +4,11 @@
 -- @license MIT
 -- @copyright 10.06.2019
 unpack or= table.unpack
-import sign                             from require "ltypekit.sign"
-import reverse, collect, mergemetatable from require "ltypekit.util"
-import metatype, metakind, metacons     from require "ltypekit.type"
-import DEBUG                            from require "ltypekit.config"
+only     = (t) -> for k, v in pairs t do return v if k != "n"
+import sign                                                                       from require "ltypekit.sign"
+import reverse, collect, mergemetatable, extractMeta, selectLast                  from require "ltypekit.util"
+import metatype, metakind, metacons, baseTypes, kindof, typeof, typefor, classfor from require "ltypekit.type"
+import DEBUG                                                                      from require "ltypekit.config"
 
 local y, c, p
 if DEBUG
@@ -19,11 +20,48 @@ else
   p, y, c = (->), (->), (->)
 
 --- Adds a new reference in `_G.__ref`
--- @tparam table ref Reference to store in `_G`
+-- @tparam table ref Reference to store in `_G`.
 addReference = (ref) ->
-  p y ref
-  p y _G.__ref
+  p "addref", y ref
   _G.__ref[(getmetatable ref).__name] = ref
+
+--- Adds a new stub reference in `_G.__ref`. This is used to select which instance of a function to use based on the arguments.
+-- @tparam string ref Name of the stub.
+newStub = (ref) ->
+  stub   = { name: ref, instances: {} }
+  __stub =
+    __index: (i) => (rawget @, "instances")[i] or error "#{ref} $ No instance defined for #{i}"
+    __call: (...) =>
+      argl            = {...}
+      farg            = argl[1]
+      p "call-stub", y argl
+      pickFunctions   = {k, v for k, v in pairs (rawget @, "instances") when k\match "^%f[%w_]#{typeof farg}%f[^%w_]"}
+      pickFunctions.n = do
+        n = 0
+        for k, v in pairs pickFunctions do n += 1
+        n
+      p "picked", y pickFunctions
+      if pickFunctions.n < 1
+        error "#{ref} $ No instance defined for type #{typeof farg}."
+      elseif pickFunctions.n == 1
+        (only pickFunctions) unpack argl
+      else
+        possibilities = do
+          final = ""
+          for k, _ in pairs pickFunctions
+            final ..= "  '#{k}'\n" unless k == "n"
+          final
+        error "#{ref} $ Ambiguous definition for function #{ref}.\n#{possibilities}"
+  setmetatable stub, __stub
+  _G.__ref[ref] = stub
+
+--- Adds a function to a stub reference in `_G.__ref`
+-- @tparam string ref Name of the stub.
+-- @tparam string annot Annotation for the function.
+-- @tparam function fn Function instance.
+addToStub = (ref, annot, fn) ->
+  newStub ref unless _G.__ref[ref]
+  _G.__ref[ref].instances[annot] = fn
 
 --- Parses a constructor out of a constructor string.
 -- @tparam string type_ The type that should be returned by the constructor.
@@ -63,28 +101,28 @@ parseConstructor = (type_, name, cons, dorecords=true, doaddrefs=true) ->
   --
   signature, records, ordered, index2r
 
--- TODO Constructor values can have some unaccessible values, restricted by __index. That means that everything must be put
--- behind a proxy table, that way we avoid stuff like `v == (Just v)[1]`. I'd have to check the side effects of that.
+-- TODO Scrap the last idea. To fix the "expected type" issue, the metatable should have a table to contain the types of its values,
+-- and somehow the applier should be able to know them.
 
 --- Creates a new constructor function out of a constructor string.
 -- @tparam string type_ Name of the type.
 -- @tparam string name Name of the constructor.
 -- @tparam string cons Constructor string.
 -- @tparam table parent Parent type for the constructor.
+-- @tparam table mt Metatable to merge with the final product. Defaults to an empty table.
 -- @treturn function Constructor.
-makeConstructor = (type_, name, cons, parent) ->
+makeConstructor = (type_, name, cons, parent, mt={}) ->
   signature, records, ordered = parseConstructor type_, name, cons
   p "len", #ordered
   if #ordered > 0
     c = sign signature
     f = (...) ->
       p "constructing-with", y {...}
-      t = (mergemetatable {__name: name, __parent: parent}) (metatype type_) (metakind name) {...}
-      p "constructed", y t
+      t = (mergemetatable mt) (mergemetatable {__name: name, __parent: parent}) (metatype type_) (metakind name) {...}
       return t
-    return ((mergemetatable {__parent: parent}) (metacons name) (c collect f, #ordered)), records
+    return ((mergemetatable mt) (mergemetatable {__parent: parent}) (metacons name) (c collect f, #ordered)), records
   else
-    return ((mergemetatable {__name: name, __parent: parent}) (metacons name) (metatype type_) (metakind name) {}), {}
+    return ((mergemetatable mt) (mergemetatable {__name: name, __parent: parent}) (metacons name) (metatype type_) (metakind name) {}), {}
 
 --- Creates a list of expected parameters.
 -- @tparam string annot Annotation for a constructor.
@@ -120,8 +158,8 @@ generateSavePairing = (constructor, tail) ->
 -- @tparam table|string constructorl List of constructors to use, or a single constructor string.
 -- @treturn Type Newly created type.
 data = (name, constructorl) ->
-  this           = { constructors: {} }
-  __this         = { __name: name, __ref: {}, __type: "Type", __kind: name }
+  this           = { constructors: {}, instanceOf: {} }
+  __this         = { __name: name, __ref: {}, __type: "Type", __kind: name, __tostring: -> name }
   __this.__index = __this.__ref
   switch type constructorl
     when "string"
@@ -130,21 +168,59 @@ data = (name, constructorl) ->
         for k,r in pairs records do __this.__ref[k] = r
         this.constructors[name] = do
           p "constructorl", y constructorl
-          --w = getListFor constructorl
-          --table.insert w, 1, name
-          --table.concat w, " "
           name .. ((constructorl != " ") and (" " .. constuctorl) or "")
         f ...
     when "table"
       for constructor, annot in pairs constructorl
-        __this.__ref[constructor] = makeConstructor name, constructor, annot, this
+        continue if constructor\match "^__"
+        __this.__ref[constructor] = makeConstructor name, constructor, annot, this, extractMeta constructorl
         this.constructors[constructor] = do
           p "annot", y annot
-          --w = getListFor annot
-          --table.insert w, 1, name
-          --table.concat w, " "
           name .. ((annot != " ") and (" " .. annot) or "")
         addReference __this.__ref[constructor] if _G.__ref
   setmetatable this, __this
+  typeof.datatypes[name] = this
+  this
 
-{ :addReference, :data, :getListFor, :generateSavePairing }
+--- Creates a new typeclass.
+-- @tparam annot Name and parameters of the new class.
+-- @tparam table signl List of signature generators.
+-- @treturn Typeclass The new typeclass.
+typeclass = (annot, signl) ->
+  parts  = [p for p in annot\gmatch "%S+"]
+  name   = parts[1]
+  table.remove parts, 1
+  --
+  this   = { instances: {}, expect: parts, signatures: signl }
+  __this = { __name: name, __type: "Typeclass", __kind: name }
+  --
+  setmetatable this, __this
+  classfor[name] = this
+  this
+
+--- Creates a new instance of a typeclass.
+-- @tparam Typeclass Typeclass to make an instance of.
+-- @usage
+--   instance Eq, Bool, compare: (ba) -> (ag) -> ba == ag
+instance = (tc, ...) ->
+  fnl        = selectLast ...
+  argl       = {i, arg for i, arg in ipairs {...} when i != #({...})}
+  for arg in *argl do table.insert arg.instanceOf, tc
+  instanceID = do
+    args = [tostring arg for arg in *argl]
+    table.concat args, ":"
+  p "new-instance", (y fnl), (y argl), instanceID
+  --
+  callWith = {}
+  for i, part in ipairs tc.expect do callWith[part] = tostring argl[i]
+  p "callWith", y callWith
+  --
+  tc.instances[instanceID] = {}
+  --
+  for fn, signature in pairs tc.signatures
+    constructor = signature callWith
+    tc.instances[instanceID][fn] = constructor fnl[fn]
+    if _G.__ref
+      addToStub fn, instanceID, tc.instances[instanceID][fn]
+
+{ :addReference, :data, :getListFor, :generateSavePairing, :instance, :typeclass }

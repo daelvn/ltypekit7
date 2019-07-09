@@ -3,7 +3,8 @@
 -- @author daelvn
 -- @license MIT
 -- @copyright 09.05.2019
-import DEBUG from require "ltypekit.config"
+import DEBUG      from require "ltypekit.config"
+import init, last from require "ltypekit.util"
 
 local y
 if DEBUG
@@ -104,6 +105,16 @@ compareCons = (c1) -> (c2) ->
   pat1 = applToPattern c1
   return (c2\match pat1) and true or unpack {false, "compareAppl $ unmatching type application. Expected #{c1}, got #{c2}."}
 
+--- Turns the context into an indexable table.
+-- @tparam table c context Context.
+-- @treturn table Normalized context.
+normalizeContext = (c) ->
+  final = {}
+  for constraint in *c
+    parts = [p for p in constraint\gmatch "%S+"]
+    final[last parts] = init parts
+  final
+
 --- Returns a Right and Left part for a function. It may also return a Context.  
 -- @tparam string signature Signature to be parsed.
 -- @tparam table context Context to be applied to the tree. Defaults to an empty table.
@@ -184,7 +195,7 @@ binarize = (signature, context={}) ->
     tree.right = tree.left
     tree.left  = ""
   -- Normalize context
-  tree.context = contextSplit tree.context
+  tree.context = normalizeContext contextSplit tree.context
   for constraint in *context do table.insert tree.context, constraint
   -- Remove top-most parens
   tree = {k, removeTopMostParens v for k, v in pairs tree}
@@ -382,6 +393,7 @@ if DEBUG
   --print "isJust", y rbinarize "(isJust) Maybe a -> Boolean"
   --print "Just", y rbinarize "(Just) a -> Maybe a"
   --print y rbinarize "a -> (a -> c) -> c"
+  print y binarize "Eq Ord a, Ord a => a -> a"
   { :contextSplit, :removeTopMostParens, :applToPattern, :binarize, :rbinarize, :annotatePar, :compareAppl, :compare, :annotate }
 else
   { :contextSplit, :removeTopMostParens, :applToPattern, :binarize, :rbinarize, :annotatePar, :compareAppl, :compare, :annotate }
