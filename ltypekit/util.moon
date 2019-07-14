@@ -3,6 +3,7 @@
 -- @author daelvn
 -- @license MIT
 -- @copyright 13.05.2019
+unpack   or= table.unpack
 color      = do
   local _color
   _color   = ((x) -> x\gsub "%%%b{}","") unless pcall -> _color = require "ansicolors"

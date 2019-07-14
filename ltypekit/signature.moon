@@ -20,6 +20,9 @@ insert   = (t) -> (v) -> table.insert t, v
 remove   = (t) -> (i) -> (e) ->
   x = table.remove t, i
   (x == e) and x or false
+concat   = (t) -> (s) ->
+  newt = {k, tostring v for k, v in pairs t}
+  table.concat newt, s
 pack     = (...)      -> {...}
 map      = (f) -> (t) -> [f v for v in *t]
 unpack or= table.unpack
@@ -31,10 +34,10 @@ isLower  = (s) -> s\match "^%l"
 -- @treturn table Parts of the type application.
 applSplit = (appl) ->
   return appl if (type appl) != "string"
-  return appl if appl\match "[-=]>"
+  return appl if (appl\gsub "%b()", "")\match "[-=]>"
   x = [part for part in appl\gmatch "%S+"]
   x.__appl = true
-  setmetatable x, __tostring: => table.concat @, " "
+  setmetatable x, __tostring: => (concat @) " "
   return x if #x > 1 else appl
 
 --- Splits a context string into a table.
@@ -212,7 +215,7 @@ binarize = (signature, context={}) ->
   --
   tree.__fn  = true
   tree.__sig = signature
-  tree
+  setmetatable tree, __tostring: => @__sig
 
 --- Recursively binarize a signature.
 -- @tparam string signature Signature to be recursively binarized.
@@ -221,11 +224,25 @@ binarize = (signature, context={}) ->
 -- @treturn table Node tree.
 rbinarize = (signature, context={}, topmost=true) ->
   tree = binarize signature, context
-  -- print "tree: " .. (require "inspect") tree
+  print "tree: " .. (require "inspect") tree
   if ((type tree.left) == "string") and tree.left\match "[=-]>"
     tree.left = rbinarize tree.left, tree.context, false
+  elseif ((type tree.left) == "table") and tree.left.__appl
+    tree.left[2] = rbinarize tree.left[2], tree.context, false if tree.left[2]\match "[=-]>"
+  elseif ((type tree.left) == "table") and tree.left.__list
+    tree.left[1] = rbinarize tree.left[1], tree.context, false if tree.left[1]\match "[=-]>"
+  elseif ((type tree.left) == "table") and tree.left.__table
+    tree.left[1] = rbinarize tree.left[1], tree.context, false if tree.left[1]\match "[=-]>"
+    tree.left[2] = rbinarize tree.left[2], tree.context, false if tree.left[2]\match "[=-]>"
   if ((type tree.right) == "string") and tree.right\match "[=-]>"
     tree.right = rbinarize tree.right, tree.context, false
+  elseif ((type tree.right) == "table") and tree.right.__appl
+    tree.right[2] = rbinarize tree.right[2], tree.context, false if tree.right[2]\match "[=-]>"
+  elseif ((type tree.right) == "table") and tree.right.__list
+    tree.right[1] = rbinarize tree.right[1], tree.context, false if tree.right[1]\match "[=-]>"
+  elseif ((type tree.right) == "table") and tree.right.__table
+    tree.right[1] = rbinarize tree.right[1], tree.context, false if tree.right[1]\match "[=-]>"
+    tree.right[2] = rbinarize tree.right[2], tree.context, false if tree.right[2]\match "[=-]>"
   tree
 
 --- Annotates a parameter with a list of constraints.
@@ -393,7 +410,8 @@ if DEBUG
   --print "isJust", y rbinarize "(isJust) Maybe a -> Boolean"
   --print "Just", y rbinarize "(Just) a -> Maybe a"
   --print y rbinarize "a -> (a -> c) -> c"
-  print y binarize "Eq Ord a, Ord a => a -> a"
+  --print y binarize "Eq Ord a, Ord a => a -> a"
+  print y rbinarize "f (b -> b) -> f b"
   { :contextSplit, :removeTopMostParens, :applToPattern, :binarize, :rbinarize, :annotatePar, :compareAppl, :compare, :annotate }
 else
   { :contextSplit, :removeTopMostParens, :applToPattern, :binarize, :rbinarize, :annotatePar, :compareAppl, :compare, :annotate }
