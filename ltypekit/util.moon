@@ -3,6 +3,9 @@
 -- @author daelvn
 -- @license MIT
 -- @copyright 13.05.2019
+import DEBUG   from require "ltypekit.config"
+import y, c, p from DEBUG
+
 unpack   or= table.unpack
 color      = do
   local _color
@@ -66,7 +69,7 @@ tracebackWarn = (s, n) =>
 -- @tparam number n Warning number. Passed alsongside s.
 warn = (c) -> (s, n) ->
   tracebackWarn c, s, n unless c.silent
-  error s                if c.safe
+  error s               if c.safe
 
 --- Reverses a list x.
 -- @tparam table x Table to be reversed.
@@ -127,8 +130,8 @@ head = (t) -> selectFirst unpack t
 --- Equivalent to `selectLast` but instead takes a table.
 last = (t) -> selectLast unpack t
 --- Returns a table with all elements but the first.
-tail = (t) -> [v for i, v in ipairs t when i != 1]
+tail = (t) -> return for v in *t[2,] do v
 --- Returns a table with all elements but the last.
-init = (t) -> [v for i, v in ipairs t when i != #t]
+init = (t) -> return for v in *t[,#t-1] do v
 
 { :warnS, :panicS, :traceback, :tracebackWarn, :die, :warn, :reverse, :collect, :mergemetatable, :extractMeta, :selectFirst, :selectLast, :head, :tail, :last, :init }

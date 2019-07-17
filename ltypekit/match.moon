@@ -6,17 +6,9 @@
 -- @license MIT
 -- @copyright 16.06.2019
 import DEBUG                                               from require "ltypekit.config"
+import y, c, p                                             from DEBUG
 import hasMeta, typeof, kindof, isConstructor, metaconsFor from require "ltypekit.type"
 import generateSavePairing                                 from require "ltypekit.typeclass"
-
-local y, c, p
-if DEBUG
-  io.stdout\setvbuf "no"
-  y = require "inspect"
-  c = require "ansicolors"
-  p = print
-else
-  p, y, c = (->), (->), (->)
 
 head = (t) -> t[1]
 tail = (t) -> return for x in *t[2,] do x

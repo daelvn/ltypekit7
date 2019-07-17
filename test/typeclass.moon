@@ -1,5 +1,5 @@
 import data, typeclass, instance, isInstanceOf from require "ltypekit.typeclass"
-import sign, impure                            from require "ltypekit.sign"
+import sign, impure, flatten                   from require "ltypekit.sign"
 import kindof                                  from require "ltypekit.type"
 import doGlobal                                from require "ltypekit"
 import DEBUG                                   from require "ltypekit.config"

@@ -7,15 +7,7 @@ import rbinarize, compare, annotate                                             
 import typeof, type1, metatype, isTable, isString, verifyList, verifyTable, kindof, typefor, classfor, isInstanceOf from require "ltypekit.type"
 import warn, die                                                                                                    from require "ltypekit.util"
 import DEBUG                                                                                                        from require "ltypekit.config"
-
-local y, c, p
-if DEBUG
-  io.stdout\setvbuf "no"
-  y = require "inspect"
-  c = require "ansicolors"
-  p = print
-else
-  p, y, c = (->), (->), (->)
+import y, c, p                                                                                                      from DEBUG
 
 local sign
 
@@ -51,8 +43,8 @@ msg_ =
     (to) -> p y to
   expected_cache: (f,w) -> (i, type_, name, got) ->
     f "Wrong value ##{i}. Expected #{type_} (#{name}), got #{got}."
-  expected: (f,w) -> (i, type_, got) ->
-    f "Wrong value ##{i}. Expected #{type_}, got #{got}."
+  expected: (f,w) -> (i, type_, got, cerr="") ->
+    f "Wrong value ##{i}. Expected #{type_}, got #{got}. #{cerr}"
   expected_list: (f,w) -> (i, type_, got) ->
     f "Wrong value ##{i}. Expected [#{type_}], got [#{got}]"
   expected_table: (f,w) -> (i, key, value) ->
@@ -153,7 +145,9 @@ checkSide = (T, argl, cache, msg, isLR, C) ->
               arg_x[i] = (sign ns.__sig, {}, cache) arg
           when "Table"
             if "TypeKit" == kindof arg
-              msg.expected i, ns.__sig, (arg.__sig or "unknown") unless (compare ns) arg.tree
+              cr, cerr = (compare ns) arg.tree
+              p "comparef", cr, cerr
+              msg.expected i, ns.__sig, (arg.__sig or "unknown"), cerr unless cr
               u = msg.modifying_cache cache
               cache    = ((annotate ns) arg.tree) cache
               u cache
@@ -249,6 +243,12 @@ sign = (signature, context={}, cache) ->
 --   printx! "string"
 impure = (f) -> -> f
 
+--- Turns a signed function into a normal function.
+-- This will make it look like a normal function to lua, but all information is lost, and therefore makes it unable to be modified.
+-- @tparam function(ltypekit) fltk TypeKit function
+-- @treturn function Flat function.
+flatten = (fltk) -> (...) -> fltk ...
+
 --toNumber = sign "(toNumber) a -> Number"
 --toNumber (a) -> tonumber a
 --p typeof toNumber "5"
@@ -260,4 +260,4 @@ impure = (f) -> -> f
 --p y (map tonumber) {"1", "2", "3"}
 --p y ((map1 tostring) tonumber) {"1", "2", "3"}
 
-{ :sign, :impure }
+{ :sign, :impure, :flatten }

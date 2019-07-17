@@ -5,16 +5,8 @@
 -- @copyright 09.05.2019
 native         = type
 getmetatable or= debug.getmetatable
-import DEBUG from require "ltypekit.config"
-
-local y, c, p
-if DEBUG
-  io.stdout\setvbuf "no"
-  y = require "inspect"
-  c = require "ansicolors"
-  p = print
-else
-  p, y, c = (->), (->), (->)
+import DEBUG   from require "ltypekit.config"
+import y, c, p from DEBUG
 
 --- Native type checking.
 -- Direct `type` replacement and extension functions. This is done so native types match the Uppercase style.

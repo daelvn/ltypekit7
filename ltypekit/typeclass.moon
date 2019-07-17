@@ -5,19 +5,12 @@
 -- @copyright 10.06.2019
 unpack or= table.unpack
 only     = (t) -> for k, v in pairs t do return v if k != "n"
-import sign                                                                       from require "ltypekit.sign"
+import sign, flatten                                                              from require "ltypekit.sign"
+import contextSplit, normalizeContext, mergeContext                               from require "ltypekit.signature"
 import reverse, collect, mergemetatable, extractMeta, selectLast                  from require "ltypekit.util"
 import metatype, metakind, metacons, baseTypes, kindof, typeof, typefor, classfor from require "ltypekit.type"
 import DEBUG                                                                      from require "ltypekit.config"
-
-local y, c, p
-if DEBUG
-  io.stdout\setvbuf "no"
-  y = require "inspect"
-  c = require "ansicolors"
-  p = print
-else
-  p, y, c = (->), (->), (->)
+import y, c, p                                                                    from DEBUG
 
 --- Adds a new reference in `_G.__ref`
 -- @tparam table ref Reference to store in `_G`.
@@ -76,7 +69,7 @@ parseConstructor = (type_, name, cons, dorecords=true, doaddrefs=true) ->
   --   "a"               : Takes any parameter.
   --   "a b"             : Takes any two parameters.
   --   "name:String x:a" : Record syntax.
-  signature = "(#{name}) "
+  signature = "#{name} ? "
   records   = {}
   ordered   = {}
   index2r   = {}
@@ -182,16 +175,28 @@ data = (name, constructorl) ->
   typeof.datatypes[name] = this
   this
 
+--- Parses constraints in a typeclass annotation
+-- @tparam string annot The annotation of the typeclass.
+-- @treturn table Context to inject in the signature
+-- @treturn string Rest of the annotation
+parseConstraintsTC = (annot) ->
+  st, en      = annot\find " => "
+  constraints = annot\sub 1, st-1
+  rest        = annot\sub en+1
+  return (normalizeContext contextSplit constraints), rest
+
 --- Creates a new typeclass.
--- @tparam annot Name and parameters of the new class.
+-- @tparam string annot Name and parameters of the new class.
 -- @tparam table signl List of signature generators.
 -- @treturn Typeclass The new typeclass.
 typeclass = (annot, signl) ->
+  context = {}
+  context, annot = parseConstraintsTC annot if annot\match " => " -- we have to extract the constraints
   parts  = [p for p in annot\gmatch "%S+"]
   name   = parts[1]
   table.remove parts, 1
   --
-  this   = { instances: {}, expect: parts, signatures: signl }
+  this   = { instances: {}, expect: parts, signatures: signl, :context }
   __this = { __name: name, __type: "Typeclass", __kind: name }
   --
   setmetatable this, __this
@@ -211,15 +216,28 @@ instance = (tc, ...) ->
     table.concat args, ":"
   p "new-instance", (y fnl), (y argl), instanceID
   --
-  callWith = {}
+  callWith = setmetatable {}, __call: (sig) => with sig
+    for param, ty in pairs @
+      _with_0 = \gsub "([ %(%[])(#{param})([ %)%]])", "%1#{ty}%3"
   for i, part in ipairs tc.expect do callWith[part] = tostring argl[i]
   p "callWith", y callWith
   --
   tc.instances[instanceID] = {}
+  -- this one required all functions to be instanced, and we don't want that
+  --for fn, signature in pairs tc.signatures
+  --  constructor = signature callWith
+  --  tc.instances[instanceID][fn] = constructor fnl[fn]
+  --  if _G.__ref
+  --    addToStub fn, instanceID, tc.instances[instanceID][fn]
   --
-  for fn, signature in pairs tc.signatures
+  for fn, defin in pairs fnl
+    signature   = tc.signatures[fn] or error "instance $ no signature defined for function #{fn}"
     constructor = signature callWith
-    tc.instances[instanceID][fn] = constructor fnl[fn]
+    -- inject context
+    (mergeContext constructor.tree.context) tc.context
+    -- instance
+    p "instancing", fn, (y constructor)
+    tc.instances[instanceID][fn] = constructor flatten defin
     if _G.__ref
       addToStub fn, instanceID, tc.instances[instanceID][fn]
 
