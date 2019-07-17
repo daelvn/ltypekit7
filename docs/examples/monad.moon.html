@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>ltypekit Documentation</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ltypekit7</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+
+
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="../examples/debug.moon.html">debug.moon</a></li>
+  <li><a href="../examples/functor.moon.html">functor.moon</a></li>
+  <li><a href="../examples/map.moon.html">map.moon</a></li>
+  <li><a href="../examples/maybe.moon.html">maybe.moon</a></li>
+  <li><strong>monad.moon</strong></li>
+  <li><a href="../examples/typeclass.moon.html">typeclass.moon</a></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/config.html">config</a></li>
+  <li><a href="../modules/init.html">init</a></li>
+  <li><a href="../modules/match.html">match</a></li>
+  <li><a href="../modules/sign.html">sign</a></li>
+  <li><a href="../modules/signature.html">signature</a></li>
+  <li><a href="../modules/type.html">type</a></li>
+  <li><a href="../modules/typeclass.html">typeclass</a></li>
+  <li><a href="../modules/util.html">util</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+    <h2>monad.moon</h2>
+<pre>
+<span class="comment">--- Implementation of the Monad class in ltypekit7.
+</span><span class="comment">-- I hope Roberto Ierusalimschy himself beats me up for this.
+</span>import data, typeclass, instance, isInstanceOf from <span class="global">require</span> <span class="string">"ltypekit.typeclass"</span>
+import sign, impure                            from <span class="global">require</span> <span class="string">"ltypekit.sign"</span>
+import match, case                             from <span class="global">require</span> <span class="string">"ltypekit.match"</span>
+import kindof                                  from <span class="global">require</span> <span class="string">"ltypekit.type"</span>
+import doGlobal                                from <span class="global">require</span> <span class="string">"ltypekit"</span>
+import DEBUG                                   from <span class="global">require</span> <span class="string">"ltypekit.config"</span>
+import y, c, p                                 from DEBUG
+
+doGlobal!
+
+compose = sign <span class="string">". ? (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c"</span>
+compose (f) -&gt; (g) -&gt; (x) -&gt; f (g x)
+
+const   = sign <span class="string">"const ? a -&gt; b -&gt; a"</span>
+const   (x) -&gt; -&gt; x
+
+Maybe = data <span class="string">"Maybe"</span>,
+  Nothing: <span class="string">""</span>
+  Just:    <span class="string">"a"</span>
+
+Functor = typeclass <span class="string">"Functor f'"</span>,
+  fmap: =&gt; sign @<span class="string">"fmap ? (a -&gt; b) -&gt; f' a -&gt; f' b"</span>
+  fc:   =&gt; sign @<span class="string">"&lt;$   ? a -&gt; f' b -&gt; f' a"</span>
+  <span class="comment">-- TODO allow for default implementations
+</span>  <span class="comment">-- TODO tuple syntax for profunctor stuff and the like. <code>(Number * Number)</code>
+</span>
+Applicative = typeclass <span class="string">"Functor f' =&gt; Applicative f'"</span>,
+  pure:    =&gt; sign @<span class="string">"pure   ? a -&gt; f' a"</span>
+  seqAppl: =&gt; sign @<span class="string">"&lt;*&gt;    ? f' (a -&gt; b) -&gt; f' a -&gt; f' b"</span>
+  liftA2:  =&gt; sign @<span class="string">"liftA2 ? (a -&gt; b -&gt; c) -&gt; f' a -&gt; f' b -&gt; f' c"</span>
+  seqR:    =&gt; sign @<span class="string">"*&gt;     ? f' a -&gt; f' b -&gt; f' b"</span>
+  seqL:    =&gt; sign @<span class="string">"&lt;*     ? f' a -&gt; f' b -&gt; f' a"</span>
+
+seqAppl1 = sign <span class="string">"&lt;**&gt; ? Applicative f =&gt; f a -&gt; f (a -&gt; b) -&gt; f b"</span>
+seqAppl1 -&gt; liftA2 (a) -&gt; (f) -&gt; f a
+
+liftA    = sign <span class="string">"liftA ? Applicative f =&gt; (a -&gt; b) -&gt; f a -&gt; f b"</span>
+liftA    (f) -&gt; (a) -&gt; pure ((seqAppl f) a)
+
+<span class="comment">--liftA3   = sign "(liftA3) Applicative f =&gt; (a -&gt; b -&gt; c -&gt; d) -&gt; f a -&gt; f b -&gt; f c -&gt; f d"
+</span><span class="comment">--liftA3   (f) -&gt; (a) -&gt; (b) -&gt; (c) -&gt; ((liftA2 f) a) (seqAppl b) c
+</span>
+Monad = typeclass <span class="string">"Applicative m' =&gt; Monad m'"</span>,
+  bind: =&gt; sign @<span class="string">"&gt;&gt;=    ? m' a -&gt; (a -&gt; m' b) -&gt; m' b"</span>
+  pass: =&gt; sign @<span class="string">"&gt;&gt;     ? m' a -&gt; m' b -&gt; m' b"</span>
+  ret:  =&gt; sign @<span class="string">"return ? a -&gt; m' a"</span>
+  fail: =&gt; sign @<span class="string">"fail   ? String -&gt; m' a"</span>
+
+instance Functor, Maybe,
+  fmap: (f) -&gt; (aa) -&gt; match aa,
+    [case Nothing]:   -&gt; Nothing
+    [case Just, <span class="string">"a"</span>]: -&gt; Just f a
+
+instance Applicative, Maybe,
+  <span class="comment">-- pure
+</span>  pure:    Just
+  <span class="comment">-- &lt;*&gt;
+</span>  seqAppl: (ff) -&gt; (aa) -&gt; match ff,
+    [case Just, <span class="string">"f"</span>]:   -&gt; (fmap f) m
+    [case Nothing]:     -&gt; Nothing
+  <span class="comment">-- liftA2
+</span>  liftA2:  (f) -&gt; (aa)  -&gt; (bb) -&gt; match aa,
+    [case Just, <span class="string">"x"</span>]:   -&gt; match bb,
+      [case Just, <span class="string">"y"</span>]: -&gt; Just ((f x) y)
+      [case bb]:        -&gt; Nothing
+    [case aa]:          -&gt; Nothing
+  <span class="comment">-- *&gt;
+</span>  seqR:    (ff) -&gt; (w)  -&gt; match ff,
+    [case Just, <span class="string">"_m1"</span>]: -&gt; w
+    [case Nothing]:     -&gt; Nothing
+
+instance Monad, Maybe,
+  <span class="comment">-- &gt;&gt;=
+</span>  bind: (aa) -&gt; (k) -&gt; match aa,
+    [case Just, <span class="string">"x"</span>]: -&gt; k x
+    [case Nothing]:   -&gt; Nothing
+  <span class="comment">-- &gt;&gt;
+</span>  pass: seqR <span class="comment">-- *&gt;
+</span>  <span class="comment">-- fail
+</span>  fail: -&gt; Nothing
+  <span class="comment">-- return
+</span>  ret:  pure
+
+kleisli = sign <span class="string">"&gt;=&gt; ? Monad m =&gt; (a -&gt; m b) -&gt; (b -&gt; m c) -&gt; a -&gt; m c"</span>
+kleisli (m) -&gt; (n) -&gt; (x) -&gt; (bind (m x)) (y) -&gt; n y
+
+f = sign <span class="string">"f ? a -&gt; Maybe b"</span>
+f (x) -&gt; Just (x+<span class="number">1</span>)
+g = sign <span class="string">"g ? a -&gt; Maybe b"</span>
+g (x) -&gt; Just (x+<span class="number">1</span>)
+<span class="comment">--p y (bind a) f
+</span>
+id = sign <span class="string">"id ? a -&gt; a"</span>
+id (x) -&gt; x
+
+<span class="comment">--&gt; Functor laws
+</span><span class="comment">--       a = Just 5
+</span><span class="comment">--- Identity law
+</span><span class="comment">--       p y (fmap.Maybe id) a
+</span><span class="comment">--       p y id a
+</span><span class="comment">--- Composition law
+</span><span class="comment">--       add1 = sign "(add1) Number -&gt; Number"
+</span><span class="comment">--       add1 (x)-&gt;x+1
+</span><span class="comment">--       p add2 5
+</span><span class="comment">--       p y (fmap.Maybe (compose add1) add1) a
+</span><span class="comment">--       fmapf  = fmap.Maybe add1
+</span><span class="comment">--       fmapg  = fmap.Maybe add1
+</span><span class="comment">--       fmapgf = (compose fmapf) fmapg
+</span><span class="comment">--       p y fmapgf a
+</span>
+<span class="comment">--&gt; Applicative laws
+</span>v = <span class="number">3</span>
+<span class="comment">--- Identity law
+</span>p y (seqAppl (pure.Maybe id)) v</pre>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2019-07-17 20:35:00 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

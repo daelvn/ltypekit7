@@ -49,7 +49,12 @@
 </ul>
 <h2>Examples</h2>
 <ul class="nowrap">
+  <li><a href="../examples/debug.moon.html">debug.moon</a></li>
+  <li><a href="../examples/functor.moon.html">functor.moon</a></li>
+  <li><a href="../examples/map.moon.html">map.moon</a></li>
   <li><a href="../examples/maybe.moon.html">maybe.moon</a></li>
+  <li><a href="../examples/monad.moon.html">monad.moon</a></li>
+  <li><a href="../examples/typeclass.moon.html">typeclass.moon</a></li>
 </ul>
 
 </div>
@@ -76,11 +81,19 @@
 	<td class="summary">Adds a new reference in <code>_G.__ref</code></td>
 	</tr>
 	<tr>
+	<td class="name" nowrap><a href="#newStub">newStub (ref)</a></td>
+	<td class="summary">Adds a new stub reference in <code>_G.__ref</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#addToStub">addToStub (ref, annot, fn)</a></td>
+	<td class="summary">Adds a function to a stub reference in <code>_G.__ref</code></td>
+	</tr>
+	<tr>
 	<td class="name" nowrap><a href="#parseConstructor">parseConstructor (type_, name, cons, dorecords, doaddrefs)</a></td>
 	<td class="summary">Parses a constructor out of a constructor string.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#makeConstructor">makeConstructor (type_, name, cons, parent)</a></td>
+	<td class="name" nowrap><a href="#makeConstructor">makeConstructor (type_, name, cons, parent, mt)</a></td>
 	<td class="summary">Creates a new constructor function out of a constructor string.</td>
 	</tr>
 	<tr>
@@ -94,6 +107,18 @@
 	<tr>
 	<td class="name" nowrap><a href="#data">data (name, constructorl)</a></td>
 	<td class="summary">Creates a new type.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#parseConstraintsTC">parseConstraintsTC (annot)</a></td>
+	<td class="summary">Parses constraints in a typeclass annotation</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#typeclass">typeclass (annot, signl)</a></td>
+	<td class="summary">Creates a new typeclass.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#instance">instance (Typeclass)</a></td>
+	<td class="summary">Creates a new instance of a typeclass.</td>
 	</tr>
 </table>
 
@@ -116,7 +141,57 @@
     <ul>
         <li><span class="parameter">ref</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
-         Reference to store in <code>_G</code>
+         Reference to store in <code>_G</code>.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "newStub"></a>
+    <strong>newStub (ref)</strong>
+    </dt>
+    <dd>
+    Adds a new stub reference in <code>_G.__ref</code>.  This is used to select which instance of a function to use based on the arguments.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ref</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Name of the stub.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "addToStub"></a>
+    <strong>addToStub (ref, annot, fn)</strong>
+    </dt>
+    <dd>
+    Adds a function to a stub reference in <code>_G.__ref</code>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ref</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Name of the stub.
+        </li>
+        <li><span class="parameter">annot</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Annotation for the function.
+        </li>
+        <li><span class="parameter">fn</span>
+            <span class="types"><span class="type">function</span></span>
+         Function instance.
         </li>
     </ul>
 
@@ -164,7 +239,7 @@
 </dd>
     <dt>
     <a name = "makeConstructor"></a>
-    <strong>makeConstructor (type_, name, cons, parent)</strong>
+    <strong>makeConstructor (type_, name, cons, parent, mt)</strong>
     </dt>
     <dd>
     Creates a new constructor function out of a constructor string.
@@ -187,6 +262,10 @@
         <li><span class="parameter">parent</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
          Parent type for the constructor.
+        </li>
+        <li><span class="parameter">mt</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Metatable to merge with the final product. Defaults to an empty table.
         </li>
     </ul>
 
@@ -295,6 +374,92 @@ generateSavePairing <span class="string">"Point2 x:Number y:Number"</span>, {<sp
 
 
 </dd>
+    <dt>
+    <a name = "parseConstraintsTC"></a>
+    <strong>parseConstraintsTC (annot)</strong>
+    </dt>
+    <dd>
+    Parses constraints in a typeclass annotation
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">annot</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The annotation of the typeclass.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        Context to inject in the signature</li>
+        <li>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        Rest of the annotation</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "typeclass"></a>
+    <strong>typeclass (annot, signl)</strong>
+    </dt>
+    <dd>
+    Creates a new typeclass.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">annot</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         Name and parameters of the new class.
+        </li>
+        <li><span class="parameter">signl</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         List of signature generators.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Typeclass</span></span>
+        The new typeclass.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "instance"></a>
+    <strong>instance (Typeclass)</strong>
+    </dt>
+    <dd>
+    Creates a new instance of a typeclass.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">Typeclass</span>
+            <span class="types"><span class="type">Typeclass</span></span>
+         to make an instance of.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">instance Eq, Bool, compare: (ba) -&gt; (ag) -&gt; ba == ag</pre>
+    </ul>
+
+</dd>
 </dl>
 
 
@@ -302,7 +467,7 @@ generateSavePairing <span class="string">"Point2 x:Number y:Number"</span>, {<sp
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2019-06-20 23:42:41 </i>
+<i style="float:right;">Last updated 2019-07-17 20:35:00 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

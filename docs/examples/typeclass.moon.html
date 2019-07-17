@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>ltypekit Documentation</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ltypekit7</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+
+
+<h2>Examples</h2>
+<ul class="nowrap">
+  <li><a href="../examples/debug.moon.html">debug.moon</a></li>
+  <li><a href="../examples/functor.moon.html">functor.moon</a></li>
+  <li><a href="../examples/map.moon.html">map.moon</a></li>
+  <li><a href="../examples/maybe.moon.html">maybe.moon</a></li>
+  <li><a href="../examples/monad.moon.html">monad.moon</a></li>
+  <li><strong>typeclass.moon</strong></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/config.html">config</a></li>
+  <li><a href="../modules/init.html">init</a></li>
+  <li><a href="../modules/match.html">match</a></li>
+  <li><a href="../modules/sign.html">sign</a></li>
+  <li><a href="../modules/signature.html">signature</a></li>
+  <li><a href="../modules/type.html">type</a></li>
+  <li><a href="../modules/typeclass.html">typeclass</a></li>
+  <li><a href="../modules/util.html">util</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+    <h2>typeclass.moon</h2>
+<pre>
+import data, typeclass, instance, isInstanceOf from <span class="global">require</span> <span class="string">"ltypekit.typeclass"</span>
+import sign, impure, flatten                   from <span class="global">require</span> <span class="string">"ltypekit.sign"</span>
+import kindof                                  from <span class="global">require</span> <span class="string">"ltypekit.type"</span>
+import doGlobal                                from <span class="global">require</span> <span class="string">"ltypekit"</span>
+import DEBUG                                   from <span class="global">require</span> <span class="string">"ltypekit.config"</span>
+
+<span class="keyword">local</span> y, c, p
+<span class="keyword">if</span> DEBUG
+  <span class="global">io</span>.stdout\setvbuf <span class="string">"no"</span>
+  y = <span class="global">require</span> <span class="string">"inspect"</span>
+  c = <span class="global">require</span> <span class="string">"ansicolors"</span>
+  p = impure <span class="global">print</span>
+<span class="keyword">else</span>
+  p, y, c = (-&gt; -&gt;), (-&gt;), (-&gt;)
+
+doGlobal!
+
+Bool = data <span class="string">"Bool"</span>,
+  True:  <span class="string">""</span>
+  False: <span class="string">""</span>
+  <span class="comment">-- these metamethods will be set for all constructors
+</span>  __eq: (ag) =&gt;
+    switch kindof @
+      when <span class="string">"True"</span>  <span class="keyword">then</span> <span class="keyword">return</span> <span class="string">"True"</span>  == kindof ag
+      when <span class="string">"False"</span> <span class="keyword">then</span> <span class="keyword">return</span> <span class="string">"False"</span> == kindof ag
+      <span class="keyword">else</span>              <span class="global">error</span> <span class="string">"Bool.__eq $ Self element is malformed"</span>
+
+Bool1 = data <span class="string">"Bool1"</span>,
+  True1:  <span class="string">""</span>
+  False1: <span class="string">""</span>
+  <span class="comment">--
+</span>  __eq: (ag) =&gt;
+    switch kindof @
+      when <span class="string">"True1"</span>  <span class="keyword">then</span> <span class="keyword">return</span> <span class="string">"True1"</span>  == kindof ag
+      when <span class="string">"False1"</span> <span class="keyword">then</span> <span class="keyword">return</span> <span class="string">"False1"</span> == kindof ag
+      <span class="keyword">else</span>               <span class="global">error</span> <span class="string">"Bool1.__eq $ Self element is malformed"</span>
+
+Eq = typeclass <span class="string">"Eq a"</span>, compare: =&gt; sign <span class="string">"#{@a} -&gt; #{@a} -&gt; Boolean"</span>
+instance Eq, Bool,  compare: (ba) -&gt; (ag) -&gt; ba == ag
+instance Eq, Bool1, compare: (ba) -&gt; (ag) -&gt; ba == ag
+
+compare1 = sign <span class="string">"(compare') (Eq a) =&gt; a -&gt; a -&gt; Boolean"</span>
+compare1 (ba) -&gt; (ag) -&gt; (compare ba) ag
+
+x = compare1 True
+p! <span class="string">"c1"</span>, y (x), indent: <span class="string">"| "</span>
+p! <span class="string">"c2"</span>, y (x False), indent: <span class="string">"| "</span>
+z = compare1 True1
+p! <span class="string">"c3"</span>, y (z), indent: <span class="string">"| "</span>
+p! <span class="string">"c4"</span>, y (z True1), indent: <span class="string">"| "</span>
+w = compare1 <span class="number">5</span>
+p! <span class="string">"c5"</span>, y (w), indent: <span class="string">"&gt; "</span>
+p! <span class="string">"c6"</span>, y (w True1), indent <span class="string">"&gt; "</span></pre>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2019-07-17 20:35:00 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

@@ -49,7 +49,12 @@
 </ul>
 <h2>Examples</h2>
 <ul class="nowrap">
+  <li><a href="../examples/debug.moon.html">debug.moon</a></li>
+  <li><a href="../examples/functor.moon.html">functor.moon</a></li>
+  <li><a href="../examples/map.moon.html">map.moon</a></li>
   <li><a href="../examples/maybe.moon.html">maybe.moon</a></li>
+  <li><a href="../examples/monad.moon.html">monad.moon</a></li>
+  <li><a href="../examples/typeclass.moon.html">typeclass.moon</a></li>
 </ul>
 
 </div>
@@ -104,6 +109,14 @@
 	<td class="summary">Compares two constraints.</td>
 	</tr>
 	<tr>
+	<td class="name" nowrap><a href="#normalizeContext">normalizeContext (c)</a></td>
+	<td class="summary">Turns the context into an indexable table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#mergeContext">mergeContext (c1, c2)</a></td>
+	<td class="summary">Merges two context tables.</td>
+	</tr>
+	<tr>
 	<td class="name" nowrap><a href="#binarize">binarize (signature, context)</a></td>
 	<td class="summary">Returns a Right and Left part for a function.</td>
 	</tr>
@@ -114,6 +127,26 @@
 	<tr>
 	<td class="name" nowrap><a href="#annotatePar">annotatePar (par, conl)</a></td>
 	<td class="summary">Annotates a parameter with a list of constraints.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#compareAppl">compareAppl ()</a></td>
+	<td class="summary">Compare a type application.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#compareApplN">compareApplN (base)</a></td>
+	<td class="summary">Compare a type application node.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#compareList">compareList (base)</a></td>
+	<td class="summary">Compare two lists</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#compareTable">compareTable (base)</a></td>
+	<td class="summary">Compare two tables</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#compareMixed">compareMixed (base)</a></td>
+	<td class="summary">Compare mixed values (like string and table)</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#compare">compare (base, against)</a></td>
@@ -367,6 +400,64 @@
 
 </dd>
     <dt>
+    <a name = "normalizeContext"></a>
+    <strong>normalizeContext (c)</strong>
+    </dt>
+    <dd>
+    Turns the context into an indexable table.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">c</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         context Context.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        Normalized context.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "mergeContext"></a>
+    <strong>mergeContext (c1, c2)</strong>
+    </dt>
+    <dd>
+    Merges two context tables.  <strong>Curried function.</strong>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">c1</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Base context.
+        </li>
+        <li><span class="parameter">c2</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         Merging context.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        Final context.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
     <a name = "binarize"></a>
     <strong>binarize (signature, context)</strong>
     </dt>
@@ -463,6 +554,108 @@
            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
         Annotated parameter.
     </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "compareAppl"></a>
+    <strong>compareAppl ()</strong>
+    </dt>
+    <dd>
+    Compare a type application.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "compareApplN"></a>
+    <strong>compareApplN (base)</strong>
+    </dt>
+    <dd>
+    Compare a type application node.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">base</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "compareList"></a>
+    <strong>compareList (base)</strong>
+    </dt>
+    <dd>
+    Compare two lists
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">base</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "compareTable"></a>
+    <strong>compareTable (base)</strong>
+    </dt>
+    <dd>
+    Compare two tables
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">base</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "compareMixed"></a>
+    <strong>compareMixed (base)</strong>
+    </dt>
+    <dd>
+    Compare mixed values (like string and table)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">base</span>
+
+
+
+        </li>
+    </ul>
+
 
 
 
@@ -575,7 +768,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2019-06-20 23:42:41 </i>
+<i style="float:right;">Last updated 2019-07-17 20:35:00 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

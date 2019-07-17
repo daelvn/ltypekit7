@@ -49,7 +49,12 @@
 </ul>
 <h2>Examples</h2>
 <ul class="nowrap">
+  <li><a href="../examples/debug.moon.html">debug.moon</a></li>
+  <li><a href="../examples/functor.moon.html">functor.moon</a></li>
+  <li><a href="../examples/map.moon.html">map.moon</a></li>
   <li><a href="../examples/maybe.moon.html">maybe.moon</a></li>
+  <li><a href="../examples/monad.moon.html">monad.moon</a></li>
+  <li><a href="../examples/typeclass.moon.html">typeclass.moon</a></li>
 </ul>
 
 </div>
@@ -80,7 +85,7 @@
 	<td class="summary">Prints a panic message.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#traceback">traceback (self, s, n)</a></td>
+	<td class="name" nowrap><a href="#traceback">traceback (self, s)</a></td>
 	<td class="summary">Prints a traceback message with details about name, signature, error and stacktrace.</td>
 	</tr>
 	<tr>
@@ -102,6 +107,38 @@
 	<tr>
 	<td class="name" nowrap><a href="#collect">collect (x, n, a)</a></td>
 	<td class="summary">Generates a function that has to be called x times to return a value.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#mergemetatable">mergemetatable (mt, t)</a></td>
+	<td class="summary">Merges the table passed with the metatable of another.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#extractMeta">extractMeta (t)</a></td>
+	<td class="summary">Extract metamethods from a common table</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#selectFirst">selectFirst (...)</a></td>
+	<td class="summary">Selects the first element from all arguments.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#selectLast">selectLast (...)</a></td>
+	<td class="summary">Selects the last element from all arguments.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#head">head (t)</a></td>
+	<td class="summary">Equivalent to <a href="../modules/util.html#selectFirst">selectFirst</a> but instead takes a table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#last">last (t)</a></td>
+	<td class="summary">Equivalent to <a href="../modules/util.html#selectLast">selectLast</a> but instead takes a table.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#tail">tail (t)</a></td>
+	<td class="summary">Returns a table with all elements but the first.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#init">init (t)</a></td>
+	<td class="summary">Returns a table with all elements but the last.</td>
 	</tr>
 </table>
 
@@ -156,7 +193,7 @@
 </dd>
     <dt>
     <a name = "traceback"></a>
-    <strong>traceback (self, s, n)</strong>
+    <strong>traceback (self, s)</strong>
     </dt>
     <dd>
     Prints a traceback message with details about name, signature, error and stacktrace.
@@ -171,10 +208,6 @@
         <li><span class="parameter">s</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
          Error message.
-        </li>
-        <li><span class="parameter">n</span>
-            <span class="types"><span class="type">number</span></span>
-         Error number.
         </li>
     </ul>
 
@@ -332,6 +365,196 @@
 
 
 </dd>
+    <dt>
+    <a name = "mergemetatable"></a>
+    <strong>mergemetatable (mt, t)</strong>
+    </dt>
+    <dd>
+    Merges the table passed with the metatable of another.  <strong>Curried function</strong>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">mt</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         The metatable to merge
+        </li>
+        <li><span class="parameter">t</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         The table to merge the metatable with.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        The table to which the method was applied.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "extractMeta"></a>
+    <strong>extractMeta (t)</strong>
+    </dt>
+    <dd>
+    Extract metamethods from a common table
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+         The table which contains metamethods
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.6">table</a></span>
+        A table with only metamethods
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "selectFirst"></a>
+    <strong>selectFirst (...)</strong>
+    </dt>
+    <dd>
+    Selects the first element from all arguments.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "selectLast"></a>
+    <strong>selectLast (...)</strong>
+    </dt>
+    <dd>
+    Selects the last element from all arguments.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "head"></a>
+    <strong>head (t)</strong>
+    </dt>
+    <dd>
+    Equivalent to <a href="../modules/util.html#selectFirst">selectFirst</a> but instead takes a table.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "last"></a>
+    <strong>last (t)</strong>
+    </dt>
+    <dd>
+    Equivalent to <a href="../modules/util.html#selectLast">selectLast</a> but instead takes a table.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "tail"></a>
+    <strong>tail (t)</strong>
+    </dt>
+    <dd>
+    Returns a table with all elements but the first.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "init"></a>
+    <strong>init (t)</strong>
+    </dt>
+    <dd>
+    Returns a table with all elements but the last.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">t</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
 </dl>
 
 
@@ -339,7 +562,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2019-06-20 23:42:41 </i>
+<i style="float:right;">Last updated 2019-07-17 20:35:00 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

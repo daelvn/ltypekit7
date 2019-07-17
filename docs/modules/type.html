@@ -52,7 +52,12 @@
 </ul>
 <h2>Examples</h2>
 <ul class="nowrap">
+  <li><a href="../examples/debug.moon.html">debug.moon</a></li>
+  <li><a href="../examples/functor.moon.html">functor.moon</a></li>
+  <li><a href="../examples/map.moon.html">map.moon</a></li>
   <li><a href="../examples/maybe.moon.html">maybe.moon</a></li>
+  <li><a href="../examples/monad.moon.html">monad.moon</a></li>
+  <li><a href="../examples/typeclass.moon.html">typeclass.moon</a></li>
 </ul>
 
 </div>
@@ -75,14 +80,6 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#selectFirst">selectFirst (...)</a></td>
-	<td class="summary">Selects the first element from all arguments.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#selectLast">selectLast (...)</a></td>
-	<td class="summary">Selects the last element from all arguments.</td>
-	</tr>
-	<tr>
 	<td class="name" nowrap><a href="#type1">type1 (a)</a></td>
 	<td class="summary"><a href="../modules/type.html#">type</a> equivalent, but returns uppercase values.</td>
 	</tr>
@@ -93,6 +90,10 @@
 	<tr>
 	<td class="name" nowrap><a href="#isIO">isIO (a)</a></td>
 	<td class="summary">Checks whether it is an <a href="https://www.lua.org/manual/5.3/manual.html#6.8">io</a> library handle.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#typefor">typefor (v)</a></td>
+	<td class="summary">Returns a datatype for a certain value, or false otherwise.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#metatype">metatype (ty, t)</a></td>
@@ -131,6 +132,10 @@
 	<td class="summary">Returns true or false depending on whether the value passed is a constructor or not.</td>
 	</tr>
 	<tr>
+	<td class="name" nowrap><a href="#isInstanceOf">isInstanceOf (tc, v)</a></td>
+	<td class="summary">Checks whether a value is an instance of a typeclass.</td>
+	</tr>
+	<tr>
 	<td class="name" nowrap><a href="#verifyList">verifyList (struct, cache, list)</a></td>
 	<td class="summary">Verifies the structure of a list.</td>
 	</tr>
@@ -157,12 +162,20 @@
 	<td class="name" nowrap><a href="#kindof">kindof</a></td>
 	<td class="summary">Returns the kind of a value.</td>
 	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#classfor">classfor</a></td>
+	<td class="summary">Resolves a string to a typeclass</td>
+	</tr>
 </table>
 <h2><a href="#typeof">typeof</a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#resolvers">resolvers</a></td>
 	<td class="summary">List of implicit resolvers to <a href="../modules/type.html#typeof">typeof</a>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#datatypes">datatypes</a></td>
+	<td class="summary">List of type strings to data type representations.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#resolve">resolve (any, resolverl)</a></td>
@@ -204,50 +217,6 @@
     <h2 class="section-header "><a name="Functions"></a>Functions</h2>
 
     <dl class="function">
-    <dt>
-    <a name = "selectFirst"></a>
-    <strong>selectFirst (...)</strong>
-    </dt>
-    <dd>
-    Selects the first element from all arguments.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">...</span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "selectLast"></a>
-    <strong>selectLast (...)</strong>
-    </dt>
-    <dd>
-    Selects the last element from all arguments.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">...</span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
     <dt>
     <a name = "type1"></a>
     <strong>type1 (a)</strong>
@@ -330,6 +299,32 @@
 
 
 
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "typefor"></a>
+    <strong>typefor (v)</strong>
+    </dt>
+    <dd>
+    Returns a datatype for a certain value, or false otherwise.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+         Any value.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Type</span> or <span class="type">false</span></span>
+        Returns the datatype, and otherwise false.
     </ol>
 
 
@@ -553,6 +548,36 @@
 
 </dd>
     <dt>
+    <a name = "isInstanceOf"></a>
+    <strong>isInstanceOf (tc, v)</strong>
+    </dt>
+    <dd>
+    Checks whether a value is an instance of a typeclass.  <strong>Curried function.</strong>
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tc</span>
+            <span class="types"><span class="type">Typeclass</span></span>
+         The base typeclass.
+        </li>
+        <li><span class="parameter">v</span>
+         The value to check.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        Whether it is an instance or not.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
     <a name = "verifyList"></a>
     <strong>verifyList (struct, cache, list)</strong>
     </dt>
@@ -753,6 +778,20 @@
 
 
 </dd>
+    <dt>
+    <a name = "classfor"></a>
+    <strong>classfor</strong>
+    </dt>
+    <dd>
+    Resolves a string to a typeclass
+
+
+
+
+
+
+
+</dd>
 </dl>
     <h2 class="section-header "><a name="typeof"></a>typeof</h2>
 
@@ -763,6 +802,20 @@
     </dt>
     <dd>
     List of implicit resolvers to <a href="../modules/type.html#typeof">typeof</a>.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "datatypes"></a>
+    <strong>datatypes</strong>
+    </dt>
+    <dd>
+    List of type strings to data type representations.
 
 
 
@@ -958,7 +1011,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2019-06-20 23:42:41 </i>
+<i style="float:right;">Last updated 2019-07-17 20:35:00 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

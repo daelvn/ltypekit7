@@ -35,9 +35,9 @@
 <h2>Examples</h2>
 <ul class="nowrap">
   <li><a href="../examples/debug.moon.html">debug.moon</a></li>
-  <li><a href="../examples/functor.moon.html">functor.moon</a></li>
+  <li><strong>functor.moon</strong></li>
   <li><a href="../examples/map.moon.html">map.moon</a></li>
-  <li><strong>maybe.moon</strong></li>
+  <li><a href="../examples/maybe.moon.html">maybe.moon</a></li>
   <li><a href="../examples/monad.moon.html">monad.moon</a></li>
   <li><a href="../examples/typeclass.moon.html">typeclass.moon</a></li>
 </ul>
@@ -57,15 +57,15 @@
 
 <div id="content">
 
-    <h2>maybe.moon</h2>
+    <h2>functor.moon</h2>
 <pre>
-<span class="comment">--- This example reflects the usage of the Maybe typeclass in MoonScript.
+<span class="comment">--- This example tries to use Functors in MoonScript.
 </span><span class="comment">-- It is truly cursed, I am aware.
-</span>import data         from <span class="global">require</span> <span class="string">"ltypekit.typeclass"</span>
-import sign, impure from <span class="global">require</span> <span class="string">"ltypekit.sign"</span>
-import match, case  from <span class="global">require</span> <span class="string">"ltypekit.match"</span>
-import doGlobal     from <span class="global">require</span> <span class="string">"ltypekit"</span>
-import DEBUG        from <span class="global">require</span> <span class="string">"ltypekit.config"</span>
+</span>import data, typeclass, instance from <span class="global">require</span> <span class="string">"ltypekit.typeclass"</span>
+import sign, impure              from <span class="global">require</span> <span class="string">"ltypekit.sign"</span>
+import match, case               from <span class="global">require</span> <span class="string">"ltypekit.match"</span>
+import doGlobal                  from <span class="global">require</span> <span class="string">"ltypekit"</span>
+import DEBUG                     from <span class="global">require</span> <span class="string">"ltypekit.config"</span>
 
 <span class="keyword">local</span> y, c, p
 <span class="keyword">if</span> DEBUG
@@ -82,24 +82,15 @@ Maybe = data <span class="string">"Maybe"</span>,
   Nothing: <span class="string">""</span>
   Just:    <span class="string">"a"</span>
 
-isJust = sign <span class="string">"(isJust) Maybe a -&gt; Boolean"</span>
-isJust (x) -&gt; switch x
-  when Nothing <span class="keyword">then</span> <span class="keyword">false</span>
-  when x       <span class="keyword">then</span> <span class="keyword">true</span>
+Functor = typeclass <span class="string">"Functor f"</span>, fmap: =&gt; sign <span class="string">"(fmap) (a -&gt; b) -&gt; #{@f} a -&gt; #{@f} b"</span>
+instance Functor, Maybe,         fmap: (f) -&gt; (m) -&gt; match m,
+  [case Nothing]:   -&gt; Nothing
+  [case Just, <span class="string">"a"</span>]: -&gt; Just (f a)
 
-fromMaybe = sign <span class="string">"(fromMaybe) a -&gt; Maybe a -&gt; a"</span>
-fromMaybe (d) -&gt; (x) -&gt; match x,
-  [case Nothing]:   -&gt;
-    <span class="global">print</span> <span class="string">"nada"</span>
-    d
-  [case Just, <span class="string">"a"</span>]: -&gt;
-    <span class="global">print</span> <span class="string">"todo"</span>
-    a
+add = sign <span class="string">"Number -&gt; Number -&gt; Number"</span>
+add (x) -&gt; (y) -&gt; x + y
 
-<span class="comment">-- Nothing becomes Nothing @string
-</span>p! y (fromMaybe <span class="string">"no string"</span>) Just <span class="string">"is string"</span>
-p! y (fromMaybe <span class="string">"no string"</span>) Nothing
-<span class="global">print</span> <span class="number">4</span></pre>
+p! y (fmap.Maybe (add <span class="number">5</span>)) (Just <span class="number">10</span>)</pre>
 
 
 </div> <!-- id="content" -->
