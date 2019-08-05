@@ -76,7 +76,10 @@ verifyAppl = (a1, cache, i, msg) -> (a2) ->
     xparam = a2[j-1]
     p "p/xparam", j, param, xparam
     if xparam -- Only compare if there's something to compare it to
-      if param\match "^%l"
+      if ("table" == type xparam) and ("table" == type param)
+        r = (compare param) xparam
+        msg.expected j, (tostring param), (tostring xparam) unless r
+      elseif param\match "^%l"
         if cache[param]
           msg.reading_from_cache param, cache[param], typeof xparam
           msg.expected_cache j, cache[param], param, typeof xparam unless cache[param] == typeof xparam

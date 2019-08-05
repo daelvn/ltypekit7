@@ -113,4 +113,5 @@ id (x) -> x
 --> Applicative laws
 v = 3
 --- Identity law
-p y (seqAppl (pure.Maybe id)) v
+--p y (seqAppl (pure.Maybe id)) v
+p y (fmap (pure.Maybe id)) v
