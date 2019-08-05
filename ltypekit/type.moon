@@ -1,8 +1,6 @@
 --- Contains a replacement for the native Lua `type` function and implements resolvers and kinds.
 -- @module type
 -- @author daelvn
--- @license MIT
--- @copyright 09.05.2019
 native         = type
 getmetatable or= debug.getmetatable
 import DEBUG   from require "ltypekit.config"

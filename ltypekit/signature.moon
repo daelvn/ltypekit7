@@ -1,8 +1,6 @@
 --- Module for parsing signatures.
 -- @module signature
 -- @author daelvn
--- @license MIT
--- @copyright 09.05.2019
 import DEBUG      from require "ltypekit.config"
 import init, last from require "ltypekit.util"
 import y, c, p    from DEBUG

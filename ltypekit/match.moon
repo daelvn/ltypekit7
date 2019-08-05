@@ -3,8 +3,6 @@
 -- availiable in the scope. All it takes is some table magic and parsing.
 -- @module match
 -- @author daelvn
--- @license MIT
--- @copyright 16.06.2019
 import DEBUG                                               from require "ltypekit.config"
 import y, c, p                                             from DEBUG
 import hasMeta, typeof, kindof, isConstructor, metaconsFor from require "ltypekit.type"

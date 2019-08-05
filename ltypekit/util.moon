@@ -1,8 +1,6 @@
 --- Various util functions for the whole project.
 -- @module util
 -- @author daelvn
--- @license MIT
--- @copyright 13.05.2019
 import DEBUG   from require "ltypekit.config"
 import y, c, p from DEBUG
 

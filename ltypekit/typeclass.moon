@@ -1,8 +1,6 @@
 --- Typeclasses, instances and type representations to use alongside `type`.
 -- @module typeclass
 -- @author daelvn
--- @license MIT
--- @copyright 10.06.2019
 unpack or= table.unpack
 only     = (t) -> for k, v in pairs t do return v if k != "n"
 import sign, flatten                                                              from require "ltypekit.sign"

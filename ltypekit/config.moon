@@ -1,8 +1,6 @@
 --- Project-wide configuration for ltypekit
 -- @module config
 -- @author daelvn
--- @license MIT
--- @copyright 20.06.2019
 unpack or= table.unpack
 
 --- Debugging flag

@@ -1,8 +1,6 @@
 --- Signs functions and does all of the typechecking.
 -- @module sign
 -- @author daelvn
--- @license MIT
--- @copyright 13.05.2019
 import rbinarize, compare, annotate                                                                                 from require "ltypekit.signature"
 import typeof, type1, metatype, isTable, isString, verifyList, verifyTable, kindof, typefor, classfor, isInstanceOf from require "ltypekit.type"
 import warn, die                                                                                                    from require "ltypekit.util"
